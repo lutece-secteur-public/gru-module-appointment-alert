@@ -82,8 +82,6 @@ public class TaskNotifyReminder extends SimpleTask
     private static final String PROPERTY_MAIL_SENDER_NAME = "genericalert.task_notify_reminder.mailSenderName";
     private static final String MESSAGE_MARK_DESCRIPTION = "genericalert.task_notify_reminder.description" ;
     
-    //constants
-    private final DateFormat dateFormat = DateFormat.getDateInstance( DateFormat.DEFAULT );
     //service 
     private final StateService _stateService  = SpringContextService.getBean( StateService.BEAN_SERVICE );
 	@Inject
@@ -105,7 +103,7 @@ public class TaskNotifyReminder extends SimpleTask
 	@Override
 	public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
 	{
-
+		DateFormat dateFormat = DateFormat.getDateInstance( DateFormat.DEFAULT );
 		AppLogService.info( "START DEBUG : \n" );
 		Date date = new Date();
         Calendar calendar = new GregorianCalendar(  );
