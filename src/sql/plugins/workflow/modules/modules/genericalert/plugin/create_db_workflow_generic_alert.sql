@@ -1,0 +1,30 @@
+DROP TABLE IF EXISTS workflow_task_notify_reminder_cf;
+DROP TABLE IF EXISTS workflow_appointment_reminder;
+
+CREATE TABLE  workflow_task_notify_reminder_cf
+(
+	id_task INT NOT NULL,
+	id_form int DEFAULT 0,
+	nb_alerts INT DEFAULT 0,
+  	PRIMARY KEY  (id_task,id_form )
+);
+
+CREATE TABLE workflow_appointment_reminder
+(
+	id_task int NOT NULL,
+	id_form int NOT NULL,
+	rank int NOT NULL,
+	time_to_alert INT NOT NULL,     
+    email_notify SMALLINT NOT NULL, 
+	sms_notify SMALLINT NOT NULL,
+	alert_message long varchar,
+	alert_subject VARCHAR ( 255 ) NOT NULL,
+	email_cc VARCHAR ( 255 ) DEFAULT NULL,
+	phone_number VARCHAR ( 255 ) DEFAULT NULL,
+	id_state_after int NOT NULL,
+	PRIMARY KEY (id_task,id_form,rank)
+);
+
+
+
+

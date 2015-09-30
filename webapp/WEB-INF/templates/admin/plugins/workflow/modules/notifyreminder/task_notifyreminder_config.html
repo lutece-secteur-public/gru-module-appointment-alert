@@ -1,0 +1,122 @@
+<#include "/admin/util/editor/editor.html" />
+<fieldset>
+<legend> #i18n{module.workflow.helpfilling.task_help_filling_config.title}</legend>
+<@messages infos=infos errors=errors/>
+<#if config?exists>
+	<#assign listSize = config.nbAlerts!>
+	<#assign listReminders = config.listReminderAppointment!>
+</#if>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="id_form">#i18n{genericalert.task_notify_reminder.labelForm} *  :</label>
+				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+					<select name="id_form" class="form-control">
+					<#list listForms as item >
+		  					<option value="${item.idForm}" <#if item.idForm==config.idForm> selected </#if>> ${item.title}</option>
+					</#list>
+					</select>
+				</div> 
+				<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+					<button class="btn btn-primary btn-small" type="submit" name="apply_idForm">
+						<i class="icon-ok icon-white"></i>&nbsp;#i18n{genericalert.task_notify_reminder.button.apply}
+					</button>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="nbAlerts"> #i18n{genericalert.task_notify_reminder.labelNumberAlerts} :</label>
+				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+					<input type="text" maxlength="1" name="nbAlerts" value="${listSize!}" class="form-control">
+					<span class="help-block">#i18n{genericalert.task_notify_reminder.labelNumberAlertsHelp} </span>
+				</div>
+				<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+					<button class="btn btn-primary btn-small" type="submit" name="apply_nbAlerts">
+						<i class="icon-ok icon-white"></i>&nbsp;#i18n{genericalert.task_notify_reminder.button.apply}
+					</button>
+				</div>
+			</div>
+							
+			<#list 1..listSize as i>		
+				<#if listSize gte i && listSize!=0>
+				<fieldset  id="rappel_${i}">
+				<legend>  #i18n{genericalert.task_notify_reminder.labelTextAlert} ${i} :</legend>	
+						
+					<div class="form-group" >
+						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="timeToAlert_${i}"> #i18n{genericalert.task_notify_reminder.labelTextAvant} : *</label>
+						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+							<input type="text" maxlength="2" name="timeToAlert_${i}" value="<#if listReminders?? && listReminders[i-1]?has_content>${listReminders[i-1].timeToAlert}</#if>"  class="form-control"/>
+							<span class="help-block">#i18n{genericalert.task_notify_reminder.labelTextAvantHelp} </span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="email_${i}">   #i18n{genericalert.task_notify_reminder.labelTextEmailAlert} :</label>
+						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+							<input type="checkbox" name="emailNotify_${i}" value="true" class="form-control" <#if listReminders?? && listReminders[i-1]?has_content><#if listReminders[i-1].emailNotify>checked="checked"</#if></#if>/>
+						</div>
+						
+					</div>
+					<#if listTel?? && listTel?size gt 0  >
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="sms_${i}"> #i18n{genericalert.task_notify_reminder.labelTextSmsAlert} :</label>
+						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+							<input type="checkbox" name="smsNotify_${i}" value="true" class="form-control" <#if listReminders?? && listReminders[i-1]?has_content><#if listReminders[i-1].smsNotify>checked="checked"</#if></#if>/>
+						</div>
+					</div>		
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="tel_${i}">#i18n{genericalert.task_notify_reminder.labelTel}   :</label>
+						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+							<select name="tel_${i}" class="form-control">
+							<#list listTel as item >
+				  					<option value="${item}" <#if listReminders?? && listReminders[i-1]?has_content><#if listReminders[i-1].numberPhone==item> selected</#if></#if> > ${item}</option>
+							</#list>
+							</select>
+						</div> 
+					</div> 
+					</#if>
+					<#if listStates?? >
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="state_${i}">#i18n{genericalert.task_notify_reminder.labelState} *  :</label>
+						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+							<select name="state_${i}" class="form-control">
+							<#list listStates as item >
+				  					<option value="${item.id}" <#if listReminders?? && listReminders[i-1]?has_content><#if listReminders[i-1].idStateAfter==item.id> selected</#if></#if> > ${item.name}</option>
+							</#list>
+							</select>
+						</div>
+					</div>
+					</#if>
+					<div class="form-group" >
+						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="alert_subject_${i}"> #i18n{genericalert.task_notify_reminder.labelTextSubject} : *</label>
+						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+							<input type="text" maxlength="255" name="alert_subject_${i}" value="<#if listReminders?? && listReminders[i-1]?has_content>${listReminders[i-1].alertSubject}</#if>" class="form-control"/>
+						</div>
+					</div>
+					<div class="form-group" >
+						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="EmailCc_${i}"> #i18n{genericalert.task_notify_reminder.labelTextCc} : </label>
+						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+							<input type="text" maxlength="255" name="emailCc_${i}" value="<#if listReminders?? && listReminders[i-1]?has_content>${listReminders[i-1].emailCc!}</#if>" class="form-control"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="alert_message_${i}">#i18n{genericalert.task_notify_reminder.labelTextAlertAppointment} * :</label>
+						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+							<textarea class="richtext" name="alert_message_${i}" class="form-control" rows="10" cols="90"><br/><#if listReminders?? &&listReminders[i-1]?has_content> ${listReminders[i-1].alertMessage!}</#if></textarea>
+						</div>
+						<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+							<span class="help-block"> #i18n{genericalert.task_notify_reminder.labelTextAlertAppointmentHelp}
+								<ul>
+									<li> ${r"${firstName}"} : #i18n{genericalert.task_notify_reminder.labelTextFirstName}</li>
+									<li>${r"${lastName}"} : #i18n{genericalert.task_notify_reminder.labelTextLastName}</li>
+									<li>${r"${date_appointment}"} : #i18n{genericalert.task_notify_reminder.labelTextDateAppointment}</li>
+									<li>${r"${time_appointment}"} : #i18n{genericalert.task_notify_reminder.labelTextTimeAppointment}</li>
+									<li>${r"${localisation}"} : #i18n{genericalert.task_notify_reminder.labelTextLocalisation}</li>
+									<li>${r"${url_cancel}"} :#i18n{genericalert.task_notify_reminder.labelTextUrlCancel}</li>
+								</ul>
+							</span>
+						</div>
+					</div>
+				</fieldset>
+				</#if>
+			</#list>		
+</fieldset>
+<@initEditor />

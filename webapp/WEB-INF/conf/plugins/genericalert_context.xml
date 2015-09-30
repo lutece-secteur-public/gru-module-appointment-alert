@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+
+	<bean id="genericalert.taskNotifyReminderConfigDAO"  class="fr.paris.lutece.plugins.genericalert.business.TaskNotifyReminderConfigDAO"/>
+
+	<bean id="genericalert.taskNotifyReminderConfigService" class="fr.paris.lutece.plugins.genericalert.service.TaskNotifyReminderConfigService"
+		p:taskConfigDAO-ref="genericalert.taskNotifyReminderConfigDAO" />
+			
+	<bean id="genericalert.taskTypeNotifyReminder" class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+	        p:key="taskNotifyReminder"
+	        p:titleI18nKey="genericalert.task_notify_reminder.title"
+	        p:beanName="genericalert.taskNotifyReminder"
+	        p:configBeanName="genericalert.taskNotifyReminderConfig"
+	        p:configRequired="true"
+	        p:taskForAutomaticAction="true" />
+	<bean id="genericalert.taskNotifyReminder" class="fr.paris.lutece.plugins.genericalert.service.TaskNotifyReminder" scope="prototype" />
+	<bean id="genericalert.taskNotifyReminderConfig" class="fr.paris.lutece.plugins.genericalert.business.TaskNotifyReminderConfig" scope="prototype" />
+	<bean id="genericalert.notifyReminderComponent" class="fr.paris.lutece.plugins.genericalert.web.NotifyReminderTaskComponent"
+		p:taskType-ref="genericalert.taskTypeNotifyReminder"
+		p:taskConfigService-ref="genericalert.taskNotifyReminderConfigService" 
+		/>
+</beans>
