@@ -250,8 +250,9 @@ public class TaskNotifyReminder extends SimpleTask
 		        		AppLogService.info( "MARK_SENDER_SMS" + MARK_SENDER_SMS  );
 		        		AppLogService.info( "strText" + strText );
 		        		
-	 	    			MailService.sendMailText( strRecipient  ,strEmailCc,  StringUtils.EMPTY,  strSenderName ,  MARK_SENDER_SMS ,reminder.getAlertSubject( ) , strText  );
-	 	        		bNotified = true ;
+	 	    			//MailService.sendMailText( strRecipient  ,strEmailCc,  StringUtils.EMPTY,  strSenderName ,  MARK_SENDER_SMS ,reminder.getAlertSubject( ) , strText  );
+	 	    			MailService.sendMailText( strRecipient  , strSenderName ,  MARK_SENDER_SMS ,reminder.getAlertSubject( ) , strText  );
+	 	    			bNotified = true ;
 	 	        		AppLogService.info( "AppointmentReminderDaemon - Info sending reminder alert SMS to : " + strRecipient );
 	                 }
 	    			 catch ( Exception e )
@@ -373,7 +374,8 @@ public class TaskNotifyReminder extends SimpleTask
         {
             State state = _stateService.findByPrimaryKey( reminder.getIdStateAfter( ) );
             Action action = _actionService.findByPrimaryKey( task.getAction( ).getId( ) );
-
+            AppLogService.info( "State reminder after  :  " + reminder.getIdStateAfter( ) );
+            
             if ( ( state != null ) && ( action != null ) )
             {
                 // Create Resource History
@@ -393,6 +395,8 @@ public class TaskNotifyReminder extends SimpleTask
                
             }
         }
+        State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
+        AppLogService.info( "State appointment after  :  " + stateAppointment.getId( ) );
     }
     /**
      * {@inheritDoc}
