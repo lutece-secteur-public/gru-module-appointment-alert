@@ -103,6 +103,12 @@ public class TaskNotifyReminder extends SimpleTask
 	@Override
 	public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
 	{
+		ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
+		
+        Action action = _actionService.findByPrimaryKey( resourceHistory.getAction( ).getId( ) );
+         
+        State stateBefore = action.getStateBefore( ) ;
+		
 		DateFormat dateFormat = DateFormat.getDateInstance( DateFormat.DEFAULT );
 		AppLogService.info( "START DEBUG : \n" );
 		Date date = new Date();
@@ -132,7 +138,9 @@ public class TaskNotifyReminder extends SimpleTask
 		        	AppLogService.info( "Current Date   : " + dateFormat.format( date ) );
 		        	AppLogService.info( "Date appointment   : " + dateFormat.format( startAppointment ) ); 
 		        	
-		        	if ( timeStartDate.getTime( ) > timestampDay.getTime( ) )
+		        	State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
+		        	
+		        	if ( timeStartDate.getTime( ) > timestampDay.getTime( ) && stateAppointment.getId( ) == stateBefore.getId( ) )
 		        	{
 			        	long lDiffTimeStamp = Math.abs ( timestampDay.getTime( ) - timeStartDate.getTime( ) ) ;
 			        	int nDays = ( int ) lDiffTimeStamp / ( 1000*60*60*24 ) ;
@@ -262,7 +270,7 @@ public class TaskNotifyReminder extends SimpleTask
     			 try
                  {
 	    			AppointmentHome.update( appointment );
-	    			doChangeState( config , new ReminderAppointment ( ) , form, appointment ) ; 
+	    			doChangeState( config , reminder , form, appointment ) ; 
 	    			AppLogService.info( "FLAG ON : " );
                  }
                  catch ( Exception e )
@@ -346,7 +354,7 @@ public class TaskNotifyReminder extends SimpleTask
 		strText = strText.replace( MARK_LOCALIZATION, strLocation  );
 		strText = strText.replace( MARK_CANCEL_APP , AppointmentApp.getCancelAppointmentUrl( appointment ) ) ;
 		
-		return msg;
+		return strText ;
 	}
 	/**
 	 * 

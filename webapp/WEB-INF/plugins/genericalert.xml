@@ -30,4 +30,12 @@
     <!-- Portlet parameters -->
     <portlets>
    </portlets>
+   <daemons>
+   		<daemon>
+			<daemon-id>AppointmentReminderDaemon</daemon-id>
+			<daemon-name>genericalert.daemon.AppointmentReminderDaemon.name</daemon-name>
+			<daemon-description>genericalert.daemon.appointmentAppointmentReminderDaemon.description</daemon-description>
+			<daemon-class>fr.paris.lutece.plugins.genericalert.daemon.AppointmentReminderDaemon</daemon-class>
+		</daemon>
+   </daemons>
 </plug-in>
