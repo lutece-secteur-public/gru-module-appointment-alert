@@ -276,7 +276,8 @@ public class TaskNotifyReminder extends SimpleTask
 	    			AppLogService.info( "BEGIN CHANGE STATE : " );
 	    			doChangeState( config , reminder , form, appointment ) ;
 	    			AppLogService.info( "END CHANGE STATE : " );
-	    			
+	    			State stateApp = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
+	    			AppLogService.info( "State appointment after changing  :  " + stateApp.getId( ) );
                  }
                  catch ( Exception e )
                  {
@@ -378,7 +379,8 @@ public class TaskNotifyReminder extends SimpleTask
          //The locale is not important. It is just used to fetch the task action id
         Locale locale = I18nService.getDefaultLocale( );
         ITask task = _taskService.findByPrimaryKey( config.getIdTask( ), locale );
-
+        State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
+        AppLogService.info( "State appointment before changing  :  " + stateAppointment.getId( ) );
         if ( task != null )
         {
             State state = _stateService.findByPrimaryKey( reminder.getIdStateAfter( ) );
@@ -404,8 +406,8 @@ public class TaskNotifyReminder extends SimpleTask
                
             }
         }
-        State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
-        AppLogService.info( "State appointment after  :  " + stateAppointment.getId( ) );
+        
+        AppLogService.info( "State appointment after changing  :  " + stateAppointment.getId( ) );
     }
     /**
      * {@inheritDoc}
