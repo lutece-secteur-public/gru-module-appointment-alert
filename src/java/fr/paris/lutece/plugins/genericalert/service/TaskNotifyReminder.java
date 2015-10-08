@@ -379,16 +379,30 @@ public class TaskNotifyReminder extends SimpleTask
          //The locale is not important. It is just used to fetch the task action id
         Locale locale = I18nService.getDefaultLocale( );
         ITask task = _taskService.findByPrimaryKey( config.getIdTask( ), locale );
+        
+        AppLogService.info( "task : " + task.getId( )  );
+        
         State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
+        
         AppLogService.info( "State appointment before changing  :  " + stateAppointment.getId( ) );
+        
         if ( task != null )
         {
+        	
             State state = _stateService.findByPrimaryKey( reminder.getIdStateAfter( ) );
+            if (state !=null)
+            {
+            	AppLogService.info( "State state : "+state.getId( ) ) ;
+            }
             Action action = _actionService.findByPrimaryKey( task.getAction( ).getId( ) );
+            
+            AppLogService.info( "Action action" + action.getId( ) );
+            
             AppLogService.info( "State reminder after  :  " + reminder.getIdStateAfter( ) );
             
             if ( ( state != null ) && ( action != null ) )
             {
+            	
                 // Create Resource History
                 ResourceHistory resourceHistory = new ResourceHistory( );
                 resourceHistory.setIdResource( appointment.getIdAppointment( ) );
@@ -401,9 +415,12 @@ public class TaskNotifyReminder extends SimpleTask
 
                 // Update Resource
                 ResourceWorkflow resourceWorkflow =  _resourceWorkflowService.findByPrimaryKey( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
+                
+                AppLogService.info("ResourceWorkflow resourceWorkflow :" +resourceWorkflow.getIdResource( ));
                 resourceWorkflow.setState( state );
                 _resourceWorkflowService.update( resourceWorkflow );
-               
+                
+                AppLogService.info("_resourceWorkflowService updated :");
             }
         }
         
