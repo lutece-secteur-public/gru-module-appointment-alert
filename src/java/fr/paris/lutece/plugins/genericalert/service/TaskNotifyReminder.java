@@ -105,7 +105,6 @@ public class TaskNotifyReminder extends SimpleTask
 	public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
 	{
 		ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-		MailService.sendMailText( "0614430798@contact-everyone.fr"  , "MAirie de paris" ,  MARK_SENDER_SMS ,"rappel 1j" , "<p>Bonjour</p>"  );
         Action action = _actionService.findByPrimaryKey( resourceHistory.getAction( ).getId( ) );
          
         State stateBefore = action.getStateBefore( ) ;
@@ -282,7 +281,7 @@ public class TaskNotifyReminder extends SimpleTask
                  catch ( Exception e )
                  {
                 	 AppLogService.info( "CATCH CHANGING STATE : " );
-                     TransactionManager.rollBack( appointmentPlugin );
+                     //TransactionManager.rollBack( appointmentPlugin );
                      throw new AppException( e.getMessage(  ), e );
                      
                  }
@@ -353,14 +352,14 @@ public class TaskNotifyReminder extends SimpleTask
 	 */
 	private String getMessageAppointment( String msg, Appointment appointment )
 	{
-		DateFormat mediumDateFormat = DateFormat.getDateTimeInstance( DateFormat.MEDIUM, DateFormat.MEDIUM);
-		SimpleDateFormat formater = new SimpleDateFormat("'le' dd MMMM yyyy 'à' hh:mm:ss");
-		SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm");
+		DateFormat mediumDateFormat = DateFormat.getDateTimeInstance( DateFormat.MEDIUM, DateFormat.MEDIUM );
+		SimpleDateFormat formater = new SimpleDateFormat( "'le' dd MMMM yyyy 'à' hh:mm:ss" );
+		SimpleDateFormat formatTime = new SimpleDateFormat( "hh:mm" );
 		String strLocation = appointment.getLocation( ) == null ? StringUtils.EMPTY : appointment.getLocation( ) ;
 		String strText = StringUtils.EMPTY;
 		strText = msg.replace( MARK_FIRST_NAME, appointment.getFirstName( ) );
 		strText = strText.replace( MARK_LAST_NAME, appointment.getLastName( ) );
-		strText = strText.replace( MARK_DATE_APP,  (mediumDateFormat.format( appointment.getDateAppointment( ) )+ "ou"+formater.format( appointment.getDateAppointment( ) )) );
+		strText = strText.replace( MARK_DATE_APP,  ( mediumDateFormat.format( appointment.getDateAppointment( ) )+ "ou"+formater.format( appointment.getDateAppointment( ) ) ) );
 		strText = strText.replace( MARK_TIME_APP,  formatTime.format( appointment.getStartAppointment( ) ) );
 		strText = strText.replace( MARK_LOCALIZATION, strLocation  );
 		strText = strText.replace( MARK_CANCEL_APP , AppointmentApp.getCancelAppointmentUrl( appointment ) ) ;
