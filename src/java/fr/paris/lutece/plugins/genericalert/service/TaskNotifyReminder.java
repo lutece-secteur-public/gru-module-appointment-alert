@@ -252,7 +252,7 @@ public class TaskNotifyReminder extends SimpleTask
 		        		AppLogService.info( "strText" + strText );
 		        		
 	 	    			//MailService.sendMailText( strRecipient  ,strEmailCc,  StringUtils.EMPTY,  strSenderName ,  MARK_SENDER_SMS ,reminder.getAlertSubject( ) , strText  );
-	 	    			MailService.sendMailText( strRecipient  , strSenderName ,  MARK_SENDER_SMS ,reminder.getAlertSubject( ) , strText  );
+	 	    			MailService.sendMailHtml( strRecipient  , strSenderName ,  MARK_SENDER_SMS ,reminder.getAlertSubject( ) , strText  );
 	 	    			bNotified = true ;
 	 	        		AppLogService.info( "AppointmentReminderDaemon - Info sending reminder alert SMS to : " + strRecipient );
 	                 }
@@ -398,8 +398,6 @@ public class TaskNotifyReminder extends SimpleTask
             
             AppLogService.info( "Action action" + action.getId( ) );
             
-            AppLogService.info( "State reminder after  :  " + reminder.getIdStateAfter( ) );
-            
             if ( ( state != null ) && ( action != null ) )
             {
             	
@@ -423,8 +421,8 @@ public class TaskNotifyReminder extends SimpleTask
                 AppLogService.info("_resourceWorkflowService updated :");
             }
         }
-        
-        AppLogService.info( "State appointment after changing  :  " + stateAppointment.getId( ) );
+        State stateApp = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
+        AppLogService.info( "State appointment after changing  :  " + stateApp.getId( ) );
     }
     /**
      * {@inheritDoc}
