@@ -68,8 +68,10 @@ import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
+import fr.paris.lutece.portal.service.datastore.DatastoreService;
 
 /**
  *
@@ -89,6 +91,7 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
 	//MARKS
     private static final String MARK_CONFIG = "config" ;
     private static final String MARK_WEBAPP_URL = "webapp_url";
+    
     private static final String MARK_LOCALE = "language";
     private static final String MARK_LOCALE_TINY = "locale";
     private static final String MARK_FALSE = "false";
@@ -98,22 +101,27 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
     private static final String MARK_TIME_ALERT = "timeToAlert_" ;
     private static final String MARK_EMAIL_NOTIFY = "emailNotify_";
     private static final String MARK_SMS_NOTIFY = "smsNotify_" ;
-    private static final String MARK_ALERT_MESSAGE = "alert_message_" ;
+    private static final String MARK_EMAIL_ALERT_MESSAGE = "email_textMessage_" ;
+    private static final String MARK_SMS_ALERT_MESSAGE = "sms_textMessage_" ;
     private static final String MARK_ALERT_SUBJECT = "alert_subject_" ;
     private static final String MARK_NUMBER_PHONE = "tel_" ;
     private static final String MARK_EMAIL_CC = "emailCc_" ;
     private static final String MARK_STATUS_WORKFLOW = "state_";
+    private static final String MARK_SMS_TEXT_LENGTH = "sms_maxlength";
     //JSP
     private static final String JSP_MODIFY_TASK = "jsp/admin/plugins/workflow/ModifyTask.jsp";
- // Properties
+ // Errors
     private static final String MESSAGE_ERROR_SUBJECT_EMPTY = "genericalert.message.error.subjectIsEmpty";
     private static final String MESSAGE_ERROR_STATUS_EMPTY = "genericalert.message.error.statusIsEmpty";
     private static final String MESSAGE_ERROR_ALERT_TIME_NO_VALID = "genericalert.message.error.alerttimeNoValid";
     private static final String MESSAGE_ERROR_NB_ALERT_NO_VALID = "genericalert.message.error.nbAlertsNoValid";
     private static final String MESSAGE_ERROR_NOTIFY_TYPE_EMPTY = "genericalert.message.error.notifyTypeEmpty" ;
-    private static final String MESSAGE_ERROR_NOTIFY_TEXT_EMPTY = "genericalert.message.error.notifyTextEmpty" ;
+    private static final String MESSAGE_ERROR_EMAIL_TEXT_EMPTY = "genericalert.message.error.notifyEmailTextEmpty" ;
+    private static final String MESSAGE_ERROR_SMS_TEXT_EMPTY = "genericalert.message.error.notifySmsTextEmpty" ;
     private static final String MESSAGE_ERROR_NUMBER_PHONE_EMPTY = "genericalert.message.error.numberPhoneEmpty" ;
     
+    //properties
+    private static final String PROPERTY_MAX_LENGTH_SMS_TEXT = "genericalert.maxLength.textSms";
    //private IStateService _stateService = SpringContextService.getBean( StateService.BEAN_SERVICE );
     
     @Inject
@@ -164,7 +172,14 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
 	        config.setIdTask( task.getId(  ) );
 	        config.setListReminderAppointment( new ArrayList < ReminderAppointment > ( ) );
 	    }
-
+		
+		String strMaxLenght = DatastoreService.getDataValue( PROPERTY_MAX_LENGTH_SMS_TEXT , StringUtils.EMPTY ) ;
+		
+		if( ! DatastoreService.existsKey( PROPERTY_MAX_LENGTH_SMS_TEXT ) )
+        {
+            DatastoreService.setDataValue( PROPERTY_MAX_LENGTH_SMS_TEXT, AppPropertiesService.getProperty( PROPERTY_MAX_LENGTH_SMS_TEXT ) );
+        }
+		
 		Map<String, Object> model = new HashMap<String, Object>(  );
             model.put( MARK_CONFIG, config );
             model.put( MARK_LIST_FORM, listForms ) ;
@@ -173,6 +188,7 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
             model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
             model.put( MARK_LOCALE, locale );
             model.put( MARK_LOCALE_TINY , locale );
+            model.put( MARK_SMS_TEXT_LENGTH, strMaxLenght );
 	       
 	    HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFY_REMINDER_CONFIG, locale, model );
         
@@ -253,7 +269,8 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
 	                    String strTimeToAlert = request.getParameter( MARK_TIME_ALERT + i ) ;
 	        			String strEmailNotify = request.getParameter( MARK_EMAIL_NOTIFY + i ) == null ? MARK_FALSE : request.getParameter( MARK_EMAIL_NOTIFY + i ) ;
 	        			String strSmsNotify = request.getParameter( MARK_SMS_NOTIFY + i ) == null ? MARK_FALSE : request.getParameter( MARK_SMS_NOTIFY + i ) ;
-	        			String strAlertMessage = request.getParameter( MARK_ALERT_MESSAGE + i ) == null ? StringUtils.EMPTY : request.getParameter( MARK_ALERT_MESSAGE + i );
+	        			String strEmailAlertMessage = request.getParameter( MARK_EMAIL_ALERT_MESSAGE + i ) == null ? StringUtils.EMPTY : request.getParameter( MARK_EMAIL_ALERT_MESSAGE + i );
+	        			String strSmsAlertMessage = request.getParameter( MARK_SMS_ALERT_MESSAGE + i ) == null ? StringUtils.EMPTY : request.getParameter( MARK_SMS_ALERT_MESSAGE + i );
 	        			String strAlertSubject = request.getParameter( MARK_ALERT_SUBJECT + i ) == null ? StringUtils.EMPTY : request.getParameter( MARK_ALERT_SUBJECT + i );
 	        			String strPhoneNumber = request.getParameter( MARK_NUMBER_PHONE + i ) == null ? StringUtils.EMPTY : request.getParameter( MARK_NUMBER_PHONE + i );
 	        			String strEmailCc = request.getParameter( MARK_EMAIL_CC + i ) == null ? StringUtils.EMPTY : request.getParameter( MARK_EMAIL_CC + i );
@@ -301,14 +318,23 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
 	        				}
 	        			}
 	        			
-	        			if ( StringUtils.isEmpty ( strAlertMessage ) )
+	        			if ( StringUtils.isEmpty ( strEmailAlertMessage ) && Boolean.parseBoolean( strEmailNotify ) )
 	        			{
 	        				if ( strApplyNbAlerts == null && strForm == null )
 	        				{
-	        					return AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_NOTIFY_TEXT_EMPTY,
+	        					return AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_EMAIL_TEXT_EMPTY,
 	        		                        AdminMessage.TYPE_STOP );
 	        				}
 	        			}
+	        			if ( StringUtils.isEmpty ( strSmsAlertMessage ) && Boolean.parseBoolean( strSmsNotify ) )
+	        			{
+	        				if ( strApplyNbAlerts == null && strForm == null )
+	        				{
+	        					return AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_SMS_TEXT_EMPTY,
+	        		                        AdminMessage.TYPE_STOP );
+	        				}
+	        			}
+	        			
 	        			else
 	        			{
 	        				reminderAppointment.setIdTask( config.getIdTask( ) ); 
@@ -317,7 +343,8 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
 	        				reminderAppointment.setTimeToAlert( Integer.parseInt( strTimeToAlert ) );
 	        				reminderAppointment.setEmailNotify( Boolean.parseBoolean( strEmailNotify ) );
 	        				reminderAppointment.setSmsNotify( Boolean.parseBoolean( strSmsNotify ) );
-	        				reminderAppointment.setAlertMessage( strAlertMessage );
+	        				reminderAppointment.setEmailAlertMessage( strEmailAlertMessage );
+	        				reminderAppointment.setSmsAlertMessage( strSmsAlertMessage );
 	        				reminderAppointment.setAlertSubject( strAlertSubject );
 	        				reminderAppointment.setNumberPhone( strPhoneNumber );
 	        				reminderAppointment.setEmailCc( strEmailCc );

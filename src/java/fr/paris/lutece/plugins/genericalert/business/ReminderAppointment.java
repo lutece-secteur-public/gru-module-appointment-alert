@@ -14,7 +14,8 @@ public class ReminderAppointment
     private int _nTimeToAlert ;
     private boolean _bEmailNotify ;
     private boolean _bSmsNotify ;
-    private String _strAlertMessage ;
+    private String _strEmailAlertMessage ;
+    private String _strSmsAlertMessage ;
     private String _strAlertSubject ;
     private String _strEmailCc;
     private String _strNumberPhone;
@@ -102,21 +103,39 @@ public class ReminderAppointment
 	}
 	
 	 /**
-     * Get alert message
-     * @return alert message
+     * Get alert email message
+     * @return email alert message
      */
-	public String getAlertMessage( ) 
+	public String getEmailAlertMessage( ) 
 	{
-		return _strAlertMessage;
+		return _strEmailAlertMessage;
 	}
 	
 	/**
-	 * Sets the alert message
+	 * Sets the email alert message
 	 * @param strAlertMessage alert message
 	 */
-	public void setAlertMessage( String strAlertMessage ) 
+	public void setEmailAlertMessage( String strAlertEmailMessage ) 
 	{
-		this._strAlertMessage = strAlertMessage;
+		this._strEmailAlertMessage = strAlertEmailMessage;
+	}
+	
+	/**
+     * Get alert sms message
+     * @return  sms message
+     */
+	public String getSmsAlertMessage( ) 
+	{
+		return _strSmsAlertMessage;
+	}
+	
+	/**
+	 * Sets the sms alert message
+	 * @param strAlertMessage alert message
+	 */
+	public void setSmsAlertMessage( String strSmsAlertMessage ) 
+	{
+		this._strSmsAlertMessage = strSmsAlertMessage;
 	}
 	
 	/**

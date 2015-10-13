@@ -140,7 +140,7 @@ public class TaskNotifyReminder extends SimpleTask
 		        	
 		        	State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
 		        	
-		        	if ( timeStartDate.getTime( ) > timestampDay.getTime( ) && stateAppointment.getId( ) == stateBefore.getId( ) )
+		        	if ( timeStartDate.getTime( ) > timestampDay.getTime( ) && stateAppointment!=null && stateAppointment.getId( ) == stateBefore.getId( ) )
 		        	{
 			        	long lDiffTimeStamp = Math.abs ( timestampDay.getTime( ) - timeStartDate.getTime( ) ) ;
 			        	int nDays = ( int ) lDiffTimeStamp / ( 1000*60*60*24 ) ;
@@ -211,18 +211,23 @@ public class TaskNotifyReminder extends SimpleTask
     		AppLogService.info( "Dest : " + appointment.getEmail( ) );
     		AppLogService.info( "Objet : " + reminder.getAlertSubject( ) );
     		
-    		String strText = reminder.getAlertMessage( ) ;
+    		String strEmailText = reminder.getEmailAlertMessage( ) ;
+    		String strSmsText = reminder.getSmsAlertMessage( ) ;
     		
-    		if ( strText!=null && !strText.isEmpty( ) )
+    		if ( strEmailText!=null && !strEmailText.isEmpty( ) )
     		{
-    			strText = getMessageAppointment( strText, appointment ) ;
+    			strEmailText = getMessageAppointment( strEmailText, appointment ) ;
+    		}
+    		if ( strSmsText!=null && !strSmsText.isEmpty( ) )
+    		{
+    			strSmsText = getMessageAppointment( strSmsText, appointment ) ;
     		}
     		if ( reminder.isEmailNotify( ) && !appointment.getEmail( ).isEmpty( ) )
     		{
     			 try
                  {
     				 AppLogService.info( "try to send MAIL : \n " );
-    				 MailService.sendMailHtml( appointment.getEmail( ) ,strEmailCc,  StringUtils.EMPTY,  strSenderName, strSenderMail ,reminder.getAlertSubject( ) , strText  );
+    				 MailService.sendMailHtml( appointment.getEmail( ) ,strEmailCc,  StringUtils.EMPTY,  strSenderName, strSenderMail ,reminder.getAlertSubject( ) , strEmailText  );
     				 bNotified = true ;
     				 AppLogService.info( "AppointmentReminderDaemon - Info sending reminder alert mail to : " + appointment.getEmail( ) );
                  }
@@ -249,10 +254,9 @@ public class TaskNotifyReminder extends SimpleTask
 	        			AppLogService.info( "strRecipient" + strRecipient );
 		        		AppLogService.info( "strSenderName" + strSenderName );
 		        		AppLogService.info( "MARK_SENDER_SMS" + MARK_SENDER_SMS  );
-		        		AppLogService.info( "strText" + strText );
+		        		AppLogService.info( "strText" + strSmsText );
 		        		
-	 	    			//MailService.sendMailText( strRecipient  ,strEmailCc,  StringUtils.EMPTY,  strSenderName ,  MARK_SENDER_SMS ,reminder.getAlertSubject( ) , strText  );
-	 	    			MailService.sendMailHtml( strRecipient  , strSenderName ,  MARK_SENDER_SMS ,reminder.getAlertSubject( ) , strText  );
+	 	    			MailService.sendMailHtml( strRecipient  , strSenderName ,  MARK_SENDER_SMS ,reminder.getAlertSubject( ) , strSmsText  );
 	 	    			bNotified = true ;
 	 	        		AppLogService.info( "AppointmentReminderDaemon - Info sending reminder alert SMS to : " + strRecipient );
 	                 }
@@ -353,14 +357,13 @@ public class TaskNotifyReminder extends SimpleTask
 	 */
 	private String getMessageAppointment( String msg, Appointment appointment )
 	{
-		DateFormat mediumDateFormat = DateFormat.getDateTimeInstance( DateFormat.MEDIUM, DateFormat.MEDIUM );
-		SimpleDateFormat formater = new SimpleDateFormat( "'le' dd MMMM yyyy 'à' hh:mm:ss" );
+		DateFormat formater =  DateFormat.getDateInstance( DateFormat.FULL, Locale.FRENCH ) ;
 		SimpleDateFormat formatTime = new SimpleDateFormat( "hh:mm" );
 		String strLocation = appointment.getLocation( ) == null ? StringUtils.EMPTY : appointment.getLocation( ) ;
 		String strText = StringUtils.EMPTY;
 		strText = msg.replace( MARK_FIRST_NAME, appointment.getFirstName( ) );
 		strText = strText.replace( MARK_LAST_NAME, appointment.getLastName( ) );
-		strText = strText.replace( MARK_DATE_APP,  ( mediumDateFormat.format( appointment.getDateAppointment( ) )+ "ou"+formater.format( appointment.getDateAppointment( ) ) ) );
+		strText = strText.replace( MARK_DATE_APP, formater.format( appointment.getDateAppointment( ) ) );
 		strText = strText.replace( MARK_TIME_APP,  formatTime.format( appointment.getStartAppointment( ) ) );
 		strText = strText.replace( MARK_LOCALIZATION, strLocation  );
 		strText = strText.replace( MARK_CANCEL_APP , AppointmentApp.getCancelAppointmentUrl( appointment ) ) ;

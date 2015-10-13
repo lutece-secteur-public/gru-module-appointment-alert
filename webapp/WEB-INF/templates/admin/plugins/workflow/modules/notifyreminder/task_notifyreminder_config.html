@@ -48,18 +48,23 @@
 							<span class="help-block">#i18n{genericalert.task_notify_reminder.labelTextAvantHelp} </span>
 						</div>
 					</div>
+					
+
+					<#assign emailChecked= listReminders?? && listReminders[i-1]?has_content && listReminders[i-1].emailNotify >
+
 					<div class="form-group">
 						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="email_${i}">   #i18n{genericalert.task_notify_reminder.labelTextEmailAlert} :</label>
 						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-							<input type="checkbox" name="emailNotify_${i}" value="true" class="form-control" <#if listReminders?? && listReminders[i-1]?has_content><#if listReminders[i-1].emailNotify>checked="checked"</#if></#if>/>
+							<input type="checkbox" name="emailNotify_${i}" value="true" class="form-control"  onchange="showEmail(${i})" id="email_${i}" <#if emailChecked> checked="checked"</#if>/>
 						</div>
 						
 					</div>
 					<#if listTel?? && listTel?size gt 0  >
+					<#assign smsChecked = listReminders?? && listReminders[i-1]?has_content && listReminders[i-1].smsNotify >
 					<div class="form-group">
 						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="sms_${i}"> #i18n{genericalert.task_notify_reminder.labelTextSmsAlert} :</label>
 						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-							<input type="checkbox" name="smsNotify_${i}" value="true" class="form-control" <#if listReminders?? && listReminders[i-1]?has_content><#if listReminders[i-1].smsNotify>checked="checked"</#if></#if>/>
+							<input type="checkbox" name="smsNotify_${i}" value="true" class="form-control" onchange="showSms(${i})" id="sms_${i}" <#if smsChecked> checked="checked"</#if>/>
 						</div>
 					</div>		
 					<div class="form-group">
@@ -97,11 +102,12 @@
 							<input type="text" maxlength="255" name="emailCc_${i}" value="<#if listReminders?? && listReminders[i-1]?has_content>${listReminders[i-1].emailCc!}</#if>" class="form-control"/>
 						</div>
 					</div>
-					<div class="form-group">
-						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="alert_message_${i}">#i18n{genericalert.task_notify_reminder.labelTextAlertAppointment} * :</label>
+					<div class="form-group" id="email_textMessage_${i}" <#if emailChecked > style="display:block"<#else>style="display:none"</#if> >
+						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="email_textMessage__${i}">#i18n{genericalert.task_notify_reminder.labelTextEmailAlertAppointment} * :</label>
 						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-							<textarea class="richtext" name="alert_message_${i}" class="form-control" rows="10" cols="90"><br/><#if listReminders?? &&listReminders[i-1]?has_content> ${listReminders[i-1].alertMessage!}</#if></textarea>
+							<textarea class="richtext" name="email_textMessage_${i}" class="form-control" rows="10" cols="90"><br/><#if listReminders?? &&listReminders[i-1]?has_content> ${listReminders[i-1].emailAlertMessage!}</#if></textarea>
 						</div>
+
 						<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
 							<span class="help-block"> #i18n{genericalert.task_notify_reminder.labelTextAlertAppointmentHelp}
 								<ul>
@@ -115,8 +121,55 @@
 							</span>
 						</div>
 					</div>
+					<div class="form-group"  id="sms_textMessage_${i}" <#if smsChecked > style="display:block"<#else>style="display:none"</#if> >
+						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="sms_textMessage_${i}">#i18n{genericalert.task_notify_reminder.labelTextSmsAlertAppointment} * :</label>
+						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+							<textarea  name="sms_textMessage_${i}" class="form-control" rows="5" cols="90" maxlength="${sms_maxlength!}" ><br/><#if listReminders?? &&listReminders[i-1]?has_content> ${listReminders[i-1].smsAlertMessage!}</#if></textarea>
+						</div>
+
+						<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+							<span class="help-block"> #i18n{genericalert.task_notify_reminder.labelTextAlertAppointmentHelp}
+								<ul>
+									<li>${r"${firstName}"} : #i18n{genericalert.task_notify_reminder.labelTextFirstName}</li>
+									<li>${r"${lastName}"} : #i18n{genericalert.task_notify_reminder.labelTextLastName}</li>
+									<li>${r"${date_appointment}"} : #i18n{genericalert.task_notify_reminder.labelTextDateAppointment}</li>
+									<li>${r"${time_appointment}"} : #i18n{genericalert.task_notify_reminder.labelTextTimeAppointment}</li>
+								</ul>
+							</span>
+						</div>
+					</div>
+
 				</fieldset>
 				</#if>
 			</#list>		
 </fieldset>
 <@initEditor />
+<script type="text/javascript">
+
+	function showEmail(i)
+	{
+		if ($('#email_'+i).is(':checked'))
+
+		    $('#email_textMessage_'+i).fadeIn('slow');
+		else 
+		    $('#email_textMessage_'+i).fadeOut('slow');
+
+	}
+	function showSms(i)
+	{
+		if ($('#sms_'+i).is(':checked'))
+
+			    $('#sms_textMessage_'+i).fadeIn('slow');
+			else 
+			    $('#sms_textMessage_'+i).fadeOut('slow');
+	}
+
+	$(document).ready(function()
+	{
+		for (i = 1 ; i<10 ; i++)
+		{
+			showEmail(i) ;
+			showSms(i)
+		}
+	});
+</script>

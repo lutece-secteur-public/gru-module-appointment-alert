@@ -62,9 +62,9 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     private static final String SQL_ID_TASK = " id_task = ?" ; 
     private static final String SQL_ID_FORM = " id_form = ?" ; 
     
-    private static final String SQL_QUERY_FIND_REMINDER_APPOINTMENT_BY_PRIMARY_KEY = "SELECT id_task, id_form, rank, time_to_alert, email_notify, sms_notify, alert_message, alert_subject, email_cc, phone_number, id_state_after FROM workflow_appointment_reminder WHERE id_form = ? AND id_task = ? ";
-    private static final String SQL_QUERY_INSERT_REMINDER_APPOINTMENT_FORM_MESSAGE = "INSERT INTO workflow_appointment_reminder(id_task,id_form, rank, time_to_alert, email_notify, sms_notify, alert_message, alert_subject, email_cc, phone_number, id_state_after) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
-    private static final String SQL_QUERY_UPDATE_REMINDER_APPOINTMENT_FORM_MESSAGE = "UPDATE workflow_appointment_reminder SET time_to_alert = ?, email_notify = ?, sms_notify = ?, alert_message = ?, alert_subject = ?, email_cc = ?, phone_number = ?, id_state_after = ? WHERE id_form = ?  AND id_task = ?";
+    private static final String SQL_QUERY_FIND_REMINDER_APPOINTMENT_BY_PRIMARY_KEY = "SELECT id_task, id_form, rank, time_to_alert, email_notify, sms_notify, email_alert_message, sms_alert_message, alert_subject, email_cc, phone_number, id_state_after FROM workflow_appointment_reminder WHERE id_form = ? AND id_task = ? ";
+    private static final String SQL_QUERY_INSERT_REMINDER_APPOINTMENT_FORM_MESSAGE = "INSERT INTO workflow_appointment_reminder(id_task,id_form, rank, time_to_alert, email_notify, sms_notify, email_alert_message, sms_alert_message, alert_subject, email_cc, phone_number, id_state_after) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
+    private static final String SQL_QUERY_UPDATE_REMINDER_APPOINTMENT_FORM_MESSAGE = "UPDATE workflow_appointment_reminder SET time_to_alert = ?, email_notify = ?, sms_notify = ?, email_alert_message = ?, sms_alert_message = ?, alert_subject = ?, email_cc = ?, phone_number = ?, id_state_after = ? WHERE id_form = ?  AND id_task = ?";
     private static final String SQL_QUERY_DELETE_REMINDER_APPOINTMENT_FORM_MESSAGE = "DELETE FROM workflow_appointment_reminder WHERE id_form = ? AND id_task= ? ";
     private static final String SQL_QUERY_RANK = " AND rank = ?";
     private static final String SQL_QUERY_ORDER_BY_RANK = " ORDER BY rank";
@@ -288,7 +288,8 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
             reminderAppointment.setTimeToAlert( daoUtil.getInt( nIndex++ ) );
             reminderAppointment.setEmailNotify( daoUtil.getBoolean( nIndex++ ) );
             reminderAppointment.setSmsNotify( daoUtil.getBoolean( nIndex++ ) );
-            reminderAppointment.setAlertMessage( daoUtil.getString( nIndex++ ) );
+            reminderAppointment.setEmailAlertMessage( daoUtil.getString( nIndex++ ) );
+            reminderAppointment.setSmsAlertMessage( daoUtil.getString( nIndex++ ) );
             reminderAppointment.setAlertSubject( daoUtil.getString( nIndex ++ ) );
             reminderAppointment.setEmailCc( daoUtil.getString( nIndex++ ) );
             reminderAppointment.setNumberPhone( daoUtil.getString( nIndex++ ) );
@@ -381,7 +382,8 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
 	        daoUtil.setInt( nIndex++, reminderAppointment.getTimeToAlert( ) );
 	        daoUtil.setBoolean( nIndex++, reminderAppointment.isEmailNotify( ) );
 	        daoUtil.setBoolean( nIndex++, reminderAppointment.isSmsNotify( ) );
-	        daoUtil.setString( nIndex++ , reminderAppointment.getAlertMessage( ) );
+	        daoUtil.setString( nIndex++ , reminderAppointment.getEmailAlertMessage( ) );
+	        daoUtil.setString( nIndex++ , reminderAppointment.getSmsAlertMessage( ) );
 	        daoUtil.setString( nIndex++, reminderAppointment.getAlertSubject( ) );
 	        daoUtil.setString( nIndex++, reminderAppointment.getEmailCc( ) );
 	        daoUtil.setString( nIndex++, reminderAppointment.getNumberPhone( ) );
@@ -426,7 +428,8 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
 		        daoUtil.setInt( nIndex++, reminderAppointment.getTimeToAlert( ) );
 		        daoUtil.setBoolean( nIndex++, reminderAppointment.isEmailNotify( ) );
 		        daoUtil.setBoolean( nIndex++, reminderAppointment.isSmsNotify( ) );
-		        daoUtil.setString( nIndex++ , reminderAppointment.getAlertMessage( ) );
+		        daoUtil.setString( nIndex++ , reminderAppointment.getEmailAlertMessage( ) );
+		        daoUtil.setString( nIndex++ , reminderAppointment.getSmsAlertMessage( ) );
 		        daoUtil.setString( nIndex++ , reminderAppointment.getAlertSubject( ) );
 		        daoUtil.setString( nIndex++, reminderAppointment.getEmailCc( ) );
 		        daoUtil.setString( nIndex++, reminderAppointment.getNumberPhone( ) );
@@ -470,7 +473,8 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
             reminderAppointment.setTimeToAlert( daoUtil.getInt( nIndex++ ) );
             reminderAppointment.setEmailNotify( daoUtil.getBoolean( nIndex++ ) );
             reminderAppointment.setSmsNotify( daoUtil.getBoolean( nIndex++ ) );
-            reminderAppointment.setAlertMessage( daoUtil.getString( nIndex++ ) );
+            reminderAppointment.setEmailAlertMessage( daoUtil.getString( nIndex++ ) );
+            reminderAppointment.setSmsAlertMessage( daoUtil.getString( nIndex++ ) );
             reminderAppointment.setAlertSubject( daoUtil.getString( nIndex++ ) );
             reminderAppointment.setEmailCc( daoUtil.getString( nIndex++ ) );
             reminderAppointment.setNumberPhone( daoUtil.getString( nIndex++ ) );
