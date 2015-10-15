@@ -55,7 +55,7 @@
     </properties>
      <scm>
         <connection>scm:git:https://github.com/lutece-secteur-public/gru-module-appointment-alert.git</connection>
-        <developerConnection>scm:https://github.com/lutece-secteur-public/gru-module-appointment-alert.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/lutece-secteur-public/gru-module-appointment-alert.git</developerConnection>
         <url>https://github.com/lutece-secteur-public/gru-module-appointment-alert.git</url>
     </scm>
 </project>
