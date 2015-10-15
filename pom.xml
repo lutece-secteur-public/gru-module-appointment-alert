@@ -50,8 +50,8 @@
 
     <properties>
         <componentName>appt-alert</componentName>
-        <jiraProjectName>APPOINTMENTALERT</jiraProjectName>
-        <jiraComponentId></jiraComponentId>
+        <jiraProjectName>APPTALERT</jiraProjectName>
+        <jiraComponentId>12908</jiraComponentId>
     </properties>
      <scm>
         <connection>scm:git:https://github.com/lutece-secteur-public/gru-module-appointment-alert.git</connection>

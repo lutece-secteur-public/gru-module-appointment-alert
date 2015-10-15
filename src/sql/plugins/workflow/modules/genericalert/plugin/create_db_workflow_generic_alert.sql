@@ -28,7 +28,7 @@ CREATE TABLE workflow_appointment_reminder
 	id_form int NOT NULL,
 	rank int NOT NULL,
 	time_to_alert INT NOT NULL,     
-    email_notify SMALLINT NOT NULL, 
+	email_notify SMALLINT NOT NULL, 
 	sms_notify SMALLINT NOT NULL,
 	email_alert_message long varchar,
 	sms_alert_message long varchar,
