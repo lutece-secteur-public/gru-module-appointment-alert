@@ -1,3 +1,36 @@
+/*
+ * Copyright (c) 2002-2014, Mairie de Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
+ */
 package fr.paris.lutece.plugins.genericalert.service;
 
 import java.sql.Timestamp;
@@ -55,6 +88,7 @@ import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 import fr.paris.lutece.util.sql.TransactionManager;
 
@@ -77,7 +111,7 @@ public class TaskNotifyReminder extends SimpleTask
     private static final String	MARK_SENDER_SMS = "magali.lemaire@paris.fr" ;
     private static final String	MARK_REGEX_SMS = "^(06|07)[0-9]{8}$" ;
     private static final String USER_AUTO = "auto";
-    private static final int 	MARK_DURATION_LIMIT = 5;
+    private static final String	MARK_DURATION_LIMIT  = "daemon.reminder.interval";
     
 	//properties
     private static final String PROPERTY_MAIL_SENDER_NAME = "genericalert.task_notify_reminder.mailSenderName";
@@ -109,7 +143,7 @@ public class TaskNotifyReminder extends SimpleTask
          
         State stateBefore = action.getStateBefore( ) ;
 		
-		DateFormat dateFormat = DateFormat.getDateInstance( DateFormat.DEFAULT );
+        DateFormat dateFormat =  DateFormat.getDateInstance( DateFormat.FULL, Locale.FRENCH ) ;
 		AppLogService.info( "START DEBUG : \n" );
 		Date date = new Date();
         Calendar calendar = new GregorianCalendar(  );
@@ -190,8 +224,10 @@ public class TaskNotifyReminder extends SimpleTask
 	 */
 	private void sendReminder ( Appointment appointment , ReminderAppointment reminder, Date startAppointment, int nDiffMin , AppointmentForm form, TaskNotifyReminderConfig config )
 	{
-		int nMinTime = ( reminder.getTimeToAlert( ) * 60 * 24 ) - MARK_DURATION_LIMIT  ;
-		int nMaxTime = ( reminder.getTimeToAlert( ) * 60 * 24 ) + MARK_DURATION_LIMIT  ;
+		int nInterval = Integer.parseInt( AppPropertiesService.getProperty( MARK_DURATION_LIMIT ) ) ;
+		
+		int nMinTime = ( reminder.getTimeToAlert( ) * 60 * 24 ) - nInterval  ;
+		int nMaxTime = ( reminder.getTimeToAlert( ) * 60 * 24 ) + nInterval  ;
 		
 		AppLogService.info( "Alert time :" + reminder.getTimeToAlert( ) );
 		AppLogService.info( "nDiffMin  : " + nDiffMin );
@@ -210,6 +246,7 @@ public class TaskNotifyReminder extends SimpleTask
     		AppLogService.info( "strSenderName : " + strSenderName );
     		AppLogService.info( "Dest : " + appointment.getEmail( ) );
     		AppLogService.info( "Objet : " + reminder.getAlertSubject( ) );
+    		AppLogService.info( "email texte : " + reminder.getEmailAlertMessage( ) );
     		
     		String strEmailText = reminder.getEmailAlertMessage( ) ;
     		String strSmsText = reminder.getSmsAlertMessage( ) ;
@@ -358,7 +395,7 @@ public class TaskNotifyReminder extends SimpleTask
 	private String getMessageAppointment( String msg, Appointment appointment )
 	{
 		DateFormat formater =  DateFormat.getDateInstance( DateFormat.FULL, Locale.FRENCH ) ;
-		SimpleDateFormat formatTime = new SimpleDateFormat( "hh:mm" );
+		SimpleDateFormat formatTime = new SimpleDateFormat( "HH:mm" );
 		String strLocation = appointment.getLocation( ) == null ? StringUtils.EMPTY : appointment.getLocation( ) ;
 		String strText = StringUtils.EMPTY;
 		strText = msg.replace( MARK_FIRST_NAME, appointment.getFirstName( ) );
@@ -393,7 +430,7 @@ public class TaskNotifyReminder extends SimpleTask
         {
         	
             State state = _stateService.findByPrimaryKey( reminder.getIdStateAfter( ) );
-            if (state !=null)
+            if ( state !=null )
             {
             	AppLogService.info( "State state : "+state.getId( ) ) ;
             }
@@ -417,11 +454,11 @@ public class TaskNotifyReminder extends SimpleTask
                 // Update Resource
                 ResourceWorkflow resourceWorkflow =  _resourceWorkflowService.findByPrimaryKey( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
                 
-                AppLogService.info("ResourceWorkflow resourceWorkflow :" +resourceWorkflow.getIdResource( ));
+                AppLogService.info( "ResourceWorkflow resourceWorkflow :" +resourceWorkflow.getIdResource( ) );
                 resourceWorkflow.setState( state );
                 _resourceWorkflowService.update( resourceWorkflow );
                 
-                AppLogService.info("_resourceWorkflowService updated :");
+                AppLogService.info( "_resourceWorkflowService updated :" );
             }
         }
         State stateApp = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
