@@ -81,6 +81,8 @@ import fr.paris.lutece.plugins.workflowcore.service.state.StateService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
 import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
+import fr.paris.lutece.portal.service.daemon.AppDaemonService;
+import fr.paris.lutece.portal.service.daemon.Daemon;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.mail.MailService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -138,13 +140,12 @@ public class TaskNotifyReminder extends SimpleTask
 	@Override
 	public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
 	{
+	
 		ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
         Action action = _actionService.findByPrimaryKey( resourceHistory.getAction( ).getId( ) );
          
         State stateBefore = action.getStateBefore( ) ;
 		
-        DateFormat dateFormat =  DateFormat.getDateInstance( DateFormat.FULL, Locale.FRENCH ) ;
-		AppLogService.info( "START DEBUG : \n" );
 		Date date = new Date();
         Calendar calendar = new GregorianCalendar(  );
         calendar.setTime( date );
@@ -169,8 +170,6 @@ public class TaskNotifyReminder extends SimpleTask
 		        	Date startAppointment = appointment.getStartAppointment( ) ;
 		        	cal2.setTime( startAppointment );
 		        	Timestamp timeStartDate = new Timestamp( cal2.getTimeInMillis(  ) );
-		        	AppLogService.info( "Current Date   : " + dateFormat.format( date ) );
-		        	AppLogService.info( "Date appointment   : " + dateFormat.format( startAppointment ) ); 
 		        	
 		        	State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
 		        	
@@ -180,7 +179,20 @@ public class TaskNotifyReminder extends SimpleTask
 			        	int nDays = ( int ) lDiffTimeStamp / ( 1000*60*60*24 ) ;
 			        	int nDiffHours = ( ( int ) lDiffTimeStamp /( 60 * 60 * 1000 ) % 24 ) + ( nDays * 24 ) ;
 			        	int nDiffMin =  ( nDiffHours * 60 ) + ( int ) ( lDiffTimeStamp / ( 60 * 1000 ) % 60 ) ;
-	
+			        	
+			        	ResourceHistory appointHistory = _resourceHistoryService.getLastHistoryResource( appointment.getIdAppointment( ),Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
+			        	Calendar cal = new GregorianCalendar(  );
+			        	if ( appointHistory != null )
+			        	{
+			        		cal.setTime( appointHistory.getCreationDate( ) );
+			        	}
+			            Timestamp timestampCreationDate = new Timestamp( cal.getTimeInMillis(  ) ) ;
+			        	
+			        	long nDiff = Math.abs ( timestampDay.getTime( ) - timestampCreationDate.getTime( ) ) ;
+			        	int nDaysCreationDate = ( int ) nDiff / ( 1000*60*60*24 ) ;
+			        	int nDiffHoursCreationDate = ( ( int ) nDiff /( 60 * 60 * 1000 ) % 24 ) + ( nDaysCreationDate * 24 ) ;
+			        	int nDiffCreationDate = ( nDiffHoursCreationDate * 60 ) +( int ) ( nDiff / ( 60 * 1000 ) % 60 ) ;
+			        	
 						if ( config.getNbAlerts( ) > 0 )
 						{
 							listReminders = config.getListReminderAppointment( );
@@ -188,7 +200,8 @@ public class TaskNotifyReminder extends SimpleTask
 		    		
 		    			for ( ReminderAppointment reminder : listReminders )
 		    			{
-		    				sendReminder ( appointment , reminder, startAppointment, nDiffMin, form, config ) ;
+		    				if ( nDiffCreationDate > 2  && timestampDay.getTime( ) > timestampCreationDate.getTime( ) )
+		    					sendReminder ( appointment , reminder, startAppointment, nDiffMin, form, config ) ;
 		    			}
 			        }
 		        }
@@ -278,7 +291,6 @@ public class TaskNotifyReminder extends SimpleTask
     		AppLogService.info( "SMS :  " + reminder.isSmsNotify( ) );
     		if ( reminder.isSmsNotify( ) && reminder.getNumberPhone( ) != null )
     		{
-    			
     			String strRecipient = getSmsFromAppointment ( appointment, reminder );
     			AppLogService.info( "PHONE : " + strRecipient );
     			
@@ -307,9 +319,6 @@ public class TaskNotifyReminder extends SimpleTask
     		}
     		if ( bNotified )
     		{
-    			 Plugin appointmentPlugin = PluginService.getPlugin( AppointmentPlugin.PLUGIN_NAME );
-
-                 TransactionManager.beginTransaction( appointmentPlugin );
                  appointment.setHasNotify( reminder.getRank( ) );
     			 try
                  {
@@ -323,11 +332,9 @@ public class TaskNotifyReminder extends SimpleTask
                  catch ( Exception e )
                  {
                 	 AppLogService.info( "CATCH CHANGING STATE : " );
-                     //TransactionManager.rollBack( appointmentPlugin );
                      throw new AppException( e.getMessage(  ), e );
                      
                  }
-    			 TransactionManager.commitTransaction( appointmentPlugin );
     		}
     	}
 	}

@@ -47,7 +47,6 @@ import fr.paris.lutece.plugins.workflowcore.service.resource.ResourceWorkflowSer
 import fr.paris.lutece.plugins.workflowcore.service.workflow.IWorkflowService;
 import fr.paris.lutece.portal.service.daemon.Daemon;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.util.AppLogService;
 
 	/**
 	* 
@@ -55,14 +54,10 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 	* To send alert reminder 
 	*/
 	public class AppointmentReminderDaemon extends Daemon 
-	
 	{
-	
 		@Override
 		public void run( ) 
 		{
-				AppLogService.info( "START DEBUG : \n" );
-            
 			  	IWorkflowService workflowService = SpringContextService.getBean( fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService.BEAN_SERVICE );
 		        WorkflowFilter workflowFilter = new WorkflowFilter(  );
 		        
@@ -85,15 +80,17 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 		            {
 		                List<ResourceWorkflow> listResource = resourceWorkflowService.getAllResourceWorkflowByState( action.getStateBefore(  )
 		                                                                                                                   .getId(  ) );
-             
+		                
 		                for ( ResourceWorkflow resource : listResource )
 		                {
+		                	
 		                    workflowService.doProcessAction( resource.getIdResource(  ), resource.getResourceType(  ),
 		                        action.getId(  ), resource.getExternalParentId(  ), null, Locale.getDefault(  ), true, null );
-		                    
+		                                        
 		                    break;
 		                }
 		            }
 		        }
 		    }
+		
 		}
