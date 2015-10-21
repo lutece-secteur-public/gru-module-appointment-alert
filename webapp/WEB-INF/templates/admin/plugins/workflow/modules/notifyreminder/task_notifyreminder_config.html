@@ -26,11 +26,11 @@
 			<div class="form-group">
 				<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="nbAlerts"> #i18n{genericalert.task_notify_reminder.labelNumberAlerts} :</label>
 				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-					<input type="text" maxlength="1" name="nbAlerts" value="${listSize!}" class="form-control">
+					<input type="text" maxlength="1" name="nbAlerts" id="nbAlerts" value="${listSize!}" class="form-control" >
 					<span class="help-block">#i18n{genericalert.task_notify_reminder.labelNumberAlertsHelp} </span>
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-					<button class="btn btn-primary btn-small" type="submit" name="apply_nbAlerts">
+					<button class="btn btn-primary btn-small" type="submit" name="apply_nbAlerts" onclick="return confirmDelete();" >
 						<i class="icon-ok icon-white"></i>&nbsp;#i18n{genericalert.task_notify_reminder.button.apply}
 					</button>
 				</div>
@@ -171,4 +171,16 @@
 			showSms(i)
 		}
 	});
+
+	function confirmDelete()
+	{
+		if ( document.getElementById("nbAlerts").value=="0")
+		{
+		    var r = confirm("Voulez-vous supprimer tous les rappels");	    
+		    if (r==false) 
+		    {
+		       return false;
+		    } 
+	    }    
+	}
 </script>
