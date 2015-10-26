@@ -104,7 +104,7 @@
 					<div class="form-group" id="email_textMessage_${i}" <#if emailChecked > style="display:block"<#else>style="display:none"</#if> >
 						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="email_textMessage__${i}">#i18n{genericalert.task_notify_reminder.labelTextEmailAlertAppointment} * :</label>
 						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-							<textarea class="richtext" name="email_textMessage_${i}" class="form-control" rows="10" cols="90"><br/><#if listReminders?? &&listReminders[i-1]?has_content> ${listReminders[i-1].emailAlertMessage!}</#if></textarea>
+							<textarea class="richtext" name="email_textMessage_${i}" class="form-control" rows="10" cols="90"><#if listReminders?? &&listReminders[i-1]?has_content> ${listReminders[i-1].emailAlertMessage!}</#if></textarea>
 						</div>
 
 						<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
@@ -123,7 +123,7 @@
 					<div class="form-group"  id="sms_textMessage_${i}" <#if smsChecked > style="display:block"<#else>style="display:none"</#if> >
 						<label class="col-xs-12 col-sm-12 col-md-3 col-lg-3 control-label" for="sms_textMessage_${i}">#i18n{genericalert.task_notify_reminder.labelTextSmsAlertAppointment} * :</label>
 						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-							<textarea  name="sms_textMessage_${i}" class="form-control" rows="5" cols="90" maxlength="${sms_maxlength!}" ><br/><#if listReminders?? &&listReminders[i-1]?has_content> ${listReminders[i-1].smsAlertMessage!}</#if></textarea>
+							<textarea  name="sms_textMessage_${i}" class="form-control" rows="5" cols="90" maxlength="${sms_maxlength!}" ><#if listReminders?? &&listReminders[i-1]?has_content> ${listReminders[i-1].smsAlertMessage!}</#if></textarea>
 						</div>
 
 						<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
