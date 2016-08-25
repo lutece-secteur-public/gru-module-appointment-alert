@@ -87,7 +87,7 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 		                    workflowService.doProcessAction( resource.getIdResource(  ), resource.getResourceType(  ),
 		                        action.getId(  ), resource.getExternalParentId(  ), null, Locale.getDefault(  ), true, null );
 		                                        
-		                    break;
+		                   // break;
 		                }
 		            }
 		        }

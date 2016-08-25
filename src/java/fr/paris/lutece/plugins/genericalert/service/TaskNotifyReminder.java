@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 
 import fr.paris.lutece.plugins.appointment.business.Appointment;
+import fr.paris.lutece.plugins.appointment.business.AppointmentFilter;
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
 import fr.paris.lutece.plugins.appointment.business.AppointmentFormHome;
 import fr.paris.lutece.plugins.appointment.business.AppointmentHome;
@@ -162,10 +163,12 @@ public class TaskNotifyReminder extends SimpleTask
 			if ( config != null )
 			{
 				List <ReminderAppointment> listReminders = null ;
-				List< Appointment > listAppointments = getListAppointment( form ) ;
+			//	List< Appointment > listAppointments = getListAppointment( form ) ;				
+				Appointment appointment= AppointmentHome.findByPrimaryKey(resourceHistory.getIdResource(  ));
 	    	
-		        for ( Appointment appointment : listAppointments )
-		        {
+		        //for ( Appointment appointment : listAppointments )
+		        //{
+				if(appointment != null){
 		        	Calendar cal2 = new GregorianCalendar(  );
 		        	Date startAppointment = appointment.getStartAppointment( ) ;
 		        	cal2.setTime( startAppointment );
@@ -188,11 +191,11 @@ public class TaskNotifyReminder extends SimpleTask
 			        	}
 			            Timestamp timestampCreationDate = new Timestamp( cal.getTimeInMillis(  ) ) ;
 			        	
-			        	long nDiff = Math.abs ( timestampDay.getTime( ) - timestampCreationDate.getTime( ) ) ;
+			        	/*long nDiff = Math.abs ( timestampDay.getTime( ) - timestampCreationDate.getTime( ) ) ;
 			        	int nDaysCreationDate = ( int ) nDiff / ( 1000*60*60*24 ) ;
 			        	int nDiffHoursCreationDate = ( ( int ) nDiff /( 60 * 60 * 1000 ) % 24 ) + ( nDaysCreationDate * 24 ) ;
 			        	int nDiffCreationDate = ( nDiffHoursCreationDate * 60 ) +( int ) ( nDiff / ( 60 * 1000 ) % 60 ) ;
-			        	
+			        	*/
 						if ( config.getNbAlerts( ) > 0 )
 						{
 							listReminders = config.getListReminderAppointment( );
@@ -200,7 +203,7 @@ public class TaskNotifyReminder extends SimpleTask
 		    		
 		    			for ( ReminderAppointment reminder : listReminders )
 		    			{
-		    				if ( nDiffCreationDate > 2  && timestampDay.getTime( ) > timestampCreationDate.getTime( ) )
+		    				//if ( nDiffCreationDate > 2  && timestampDay.getTime( ) > timestampCreationDate.getTime( ) )
 		    					sendReminder ( appointment , reminder, startAppointment, nDiffMin, form, config ) ;
 		    			}
 			        }
