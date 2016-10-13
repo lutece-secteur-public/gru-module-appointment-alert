@@ -54,14 +54,16 @@ public final class TaskNotifyReminderConfigHome
     /**
      * Private constructor - this class need not be instantiated
      */
-    private TaskNotifyReminderConfigHome(  )
+    private TaskNotifyReminderConfigHome( )
     {
     }
 
     /**
      * Create an instance of the taskReminderConfig class
-     * @param taskReminderConfig The instance of the TaskReminderConfig which contains the informations to store
-     * @return The  instance of taskReminderConfig which has been created with its primary key.
+     * 
+     * @param taskReminderConfig
+     *            The instance of the TaskReminderConfig which contains the informations to store
+     * @return The instance of taskReminderConfig which has been created with its primary key.
      */
     public static TaskNotifyReminderConfig create( TaskNotifyReminderConfig taskReminderConfig )
     {
@@ -72,8 +74,10 @@ public final class TaskNotifyReminderConfigHome
 
     /**
      * Update of the taskReminderConfig which is specified in parameter
-     * @param taskReminderConfig The instance of the TaskReminderConfig which contains the data to store
-     * @return The instance of the  taskReminderConfig which has been updated
+     * 
+     * @param taskReminderConfig
+     *            The instance of the TaskReminderConfig which contains the data to store
+     * @return The instance of the taskReminderConfig which has been updated
      */
     public static TaskNotifyReminderConfig update( TaskNotifyReminderConfig taskReminderConfig )
     {
@@ -84,19 +88,23 @@ public final class TaskNotifyReminderConfigHome
 
     /**
      * Remove the taskReminderConfig whose identifier is specified in parameter
-     * @param nKey The taskReminderConfig Id
+     * 
+     * @param nKey
+     *            The taskReminderConfig Id
      */
     public static void remove( int nKey )
     {
         _dao.delete( nKey );
     }
-    
-    ///////////////////////////////////////////////////////////////////////////
+
+    // /////////////////////////////////////////////////////////////////////////
     // Finders
 
     /**
      * Returns an instance of a taskReminderConfig whose identifier is specified in parameter
-     * @param nKey The taskReminderConfig primary key
+     * 
+     * @param nKey
+     *            The taskReminderConfig primary key
      * @return an instance of TaskReminderConfig
      */
     public static TaskNotifyReminderConfig findByPrimaryKey( int nKey )
@@ -106,74 +114,86 @@ public final class TaskNotifyReminderConfigHome
 
     /**
      * Load the data of all the taskReminderConfig objects and returns them in form of a collection
+     * 
      * @return the collection which contains the data of all the taskReminderConfig objects
      */
     public static Collection<TaskNotifyReminderConfig> getTaskReminderConfigsList( )
     {
         return _dao.selectTaskReminderConfigsList( _plugin );
     }
-    
+
     /**
      * Load the id of all the taskReminderConfig objects and returns them in form of a collection
+     * 
      * @return the collection which contains the id of all the taskReminderConfig objects
      */
     public static Collection<Integer> getIdTaskReminderConfigsList( )
     {
         return _dao.selectIdTaskReminderConfigsList( _plugin );
     }
-    
+
     /**
      * Remove a Appointment Reminder
-     * @param idTask the id task
-     * @param nAppointmentFormId id form appointment
-     * @param rank the rank
-     * @param bool to delete all reminders
+     * 
+     * @param idTask
+     *            the id task
+     * @param nAppointmentFormId
+     *            id form appointment
+     * @param rank
+     *            the rank
+     * @param bool
+     *            to delete all reminders
      */
-    public static void removeAppointmentReminder ( int idTask, int nAppointmentFormId, int rank, boolean bool )
+    public static void removeAppointmentReminder( int idTask, int nAppointmentFormId, int rank, boolean bool )
     {
-    	_dao.deleteReminderAppointment( idTask, nAppointmentFormId, rank, bool, _plugin );
+        _dao.deleteReminderAppointment( idTask, nAppointmentFormId, rank, bool, _plugin );
     }
-    
+
     /**
      * 
-     * @param idTask the id task
-     * @param nAppointmentFormId id form
+     * @param idTask
+     *            the id task
+     * @param nAppointmentFormId
+     *            id form
      * @return list ReminderAppointment
      */
-    public static List<ReminderAppointment> loadListReminderAppointment ( int idTask, int nAppointmentFormId )
+    public static List<ReminderAppointment> loadListReminderAppointment( int idTask, int nAppointmentFormId )
     {
-    	return _dao.loadListReminderAppointment ( idTask,  nAppointmentFormId, _plugin );
+        return _dao.loadListReminderAppointment( idTask, nAppointmentFormId, _plugin );
     }
-    
+
     /**
      * 
-     * @param nKey id task
-     * @param idForm id form
+     * @param nKey
+     *            id task
+     * @param idForm
+     *            id form
      * @return TaskNotifyReminderConfig the config
      */
     public static TaskNotifyReminderConfig findByIdForm( int nKey, int idForm )
     {
         return _dao.loadByIdForm( nKey, idForm, _plugin );
     }
-    
+
     /**
      * 
-     * @param idTask the id task
+     * @param idTask
+     *            the id task
      * @return list TaskNotifyReminderConfig
      */
-    public static List<TaskNotifyReminderConfig> loadListTaskNotifyConfig ( int idTask )
+    public static List<TaskNotifyReminderConfig> loadListTaskNotifyConfig( int idTask )
     {
-    	return _dao.loadListTaskNotifyConfig( idTask, _plugin ) ;
+        return _dao.loadListTaskNotifyConfig( idTask, _plugin );
     }
-    
+
     /**
      * 
-     * @param idForm the id form
+     * @param idForm
+     *            the id form
      * @return TaskNotifyReminderConfig the config
      */
-    public static TaskNotifyReminderConfig loadConfigByIdForm ( int idForm )
+    public static TaskNotifyReminderConfig loadConfigByIdForm( int idForm )
     {
-    	return _dao.loadConfigByIdForm( idForm, _plugin );
+        return _dao.loadConfigByIdForm( idForm, _plugin );
     }
 }
-

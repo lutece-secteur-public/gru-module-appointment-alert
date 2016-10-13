@@ -31,7 +31,7 @@
  *
  * License 1.0
  */
- 
+
 package fr.paris.lutece.plugins.genericalert.business;
 
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
@@ -39,8 +39,6 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 
 import java.util.Collection;
 import java.util.List;
-
-
 
 /**
  * ITaskReminderConfigDAO Interface
@@ -50,89 +48,114 @@ public interface ITaskNotifyReminderConfigDAO extends ITaskConfigDAO<TaskNotifyR
 
     /**
      * Insert a new record in the table.
-     * @param taskReminderConfig instance of the TaskReminderConfig object to insert
+     * 
+     * @param taskReminderConfig
+     *            instance of the TaskReminderConfig object to insert
      */
     void insert( TaskNotifyReminderConfig taskReminderConfig );
 
     /**
      * Update the record in the table
-     * @param taskReminderConfig the reference of the TaskReminderConfig
+     * 
+     * @param taskReminderConfig
+     *            the reference of the TaskReminderConfig
      */
     void store( TaskNotifyReminderConfig taskReminderConfig );
 
     /**
      * Delete a record from the table
-     * @param nKey The identifier of the TaskReminderConfig to delete
+     * 
+     * @param nKey
+     *            The identifier of the TaskReminderConfig to delete
      */
     void delete( int nKey );
 
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     // Finders
 
     /**
      * Load the data from the table
-     * @param nKey The identifier of the taskReminderConfig
+     * 
+     * @param nKey
+     *            The identifier of the taskReminderConfig
      * @return The instance of the taskReminderConfig
      */
     TaskNotifyReminderConfig load( int nKey );
 
     /**
      * Load the data of all the taskReminderConfig objects and returns them as a collection
-     * @param plugin the Plugin
+     * 
+     * @param plugin
+     *            the Plugin
      * @return The collection which contains the data of all the taskReminderConfig objects
      */
     Collection<TaskNotifyReminderConfig> selectTaskReminderConfigsList( Plugin plugin );
-    
+
     /**
      * Load the id of all the taskReminderConfig objects and returns them as a collection
-     * @param plugin the Plugin
+     * 
+     * @param plugin
+     *            the Plugin
      * @return The collection which contains the id of all the taskReminderConfig objects
      */
     Collection<Integer> selectIdTaskReminderConfigsList( Plugin plugin );
-    
+
     /**
      * 
-     * @param nIdForm the idform
-     * @param nIdTask the id task
-     * @param nRank the rank reminder
-     * @param b boolean delete
-     * @param plugin the plugin
+     * @param nIdForm
+     *            the idform
+     * @param nIdTask
+     *            the id task
+     * @param nRank
+     *            the rank reminder
+     * @param b
+     *            boolean delete
+     * @param plugin
+     *            the plugin
      */
-	void deleteReminderAppointment( int nIdForm,int nIdTask , int nRank, boolean b, Plugin plugin );
-	
-	/**
-	 * @param nIdTask the id task
-	 * @param nAppointmentFormId the id form 
-	 * @param plugin the plugin
-	 * @return list ReminderAppointment
-	 */
-	List<ReminderAppointment> loadListReminderAppointment( int nIdTask,  int nAppointmentFormId, Plugin plugin );
-	
-	/**
-	 * 
-	 * @param nKey the id task
-	 * @param idForm the id form
-	 * @param plugin the plugin
-	 * @return TaskNotifyReminderConfig
-	 */
-	TaskNotifyReminderConfig loadByIdForm( int nKey, int idForm, Plugin plugin );
-	
-	/**
-	 * 
-	 * @param idTask the id task
-	 * @param plugin the plugin
-	 * @return list TaskNotifyReminderConfig 
-	 */
-	List<TaskNotifyReminderConfig> loadListTaskNotifyConfig( int idTask, Plugin plugin );
+    void deleteReminderAppointment( int nIdForm, int nIdTask, int nRank, boolean b, Plugin plugin );
 
-	/**
-	 * 
-	 * @param idForm the id form
-	 * @param plugin the plugin
-	 * @return TaskNotifyReminderConfig
-	 */
-	TaskNotifyReminderConfig loadConfigByIdForm( int idForm, Plugin plugin );
+    /**
+     * @param nIdTask
+     *            the id task
+     * @param nAppointmentFormId
+     *            the id form
+     * @param plugin
+     *            the plugin
+     * @return list ReminderAppointment
+     */
+    List<ReminderAppointment> loadListReminderAppointment( int nIdTask, int nAppointmentFormId, Plugin plugin );
 
+    /**
+     * 
+     * @param nKey
+     *            the id task
+     * @param idForm
+     *            the id form
+     * @param plugin
+     *            the plugin
+     * @return TaskNotifyReminderConfig
+     */
+    TaskNotifyReminderConfig loadByIdForm( int nKey, int idForm, Plugin plugin );
+
+    /**
+     * 
+     * @param idTask
+     *            the id task
+     * @param plugin
+     *            the plugin
+     * @return list TaskNotifyReminderConfig
+     */
+    List<TaskNotifyReminderConfig> loadListTaskNotifyConfig( int idTask, Plugin plugin );
+
+    /**
+     * 
+     * @param idForm
+     *            the id form
+     * @param plugin
+     *            the plugin
+     * @return TaskNotifyReminderConfig
+     */
+    TaskNotifyReminderConfig loadConfigByIdForm( int idForm, Plugin plugin );
 
 }
-

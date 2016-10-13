@@ -52,59 +52,62 @@ import fr.paris.lutece.portal.service.daemon.Daemon;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
-	/**
-	* 
-	* Class Appointment Daemon Reminder
-	* To send alert reminder 
-	*/
-	public class AppointmentReminderDaemon extends Daemon 
-	{
-		
-		private TaskNotifyReminder _taskReminder = SpringContextService.getBean("genericalert.taskNotifyReminder");
-		@Override
-		public void run( ) 
-		{
-			
-			  	IWorkflowService workflowService = SpringContextService.getBean( fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService.BEAN_SERVICE );
-		        WorkflowFilter workflowFilter = new WorkflowFilter(  );
-		        
-		        workflowFilter.setIsEnabled( 1 );
-		        
-		        List<Workflow> listWorkflows = workflowService.getListWorkflowsByFilter( workflowFilter );
-		        IResourceWorkflowService resourceWorkflowService = SpringContextService.getBean( ResourceWorkflowService.BEAN_SERVICE );
+/**
+ * 
+ * Class Appointment Daemon Reminder To send alert reminder
+ */
+public class AppointmentReminderDaemon extends Daemon
+{
 
-		        for ( Workflow workflow : listWorkflows )
-		        {
-		            IActionService actionService = SpringContextService.getBean( ActionService.BEAN_SERVICE );
-		            ActionFilter filter = new ActionFilter(  );
+    private TaskNotifyReminder _taskReminder = SpringContextService.getBean( "genericalert.taskNotifyReminder" );
 
-		            filter.setAutomaticReflexiveAction( true );
-		            filter.setIdWorkflow( workflow.getId(  ) );
+    @Override
+    public void run( )
+    {
 
-		            List<Action> listAutomaticActions = actionService.getListActionByFilter( filter );
+        IWorkflowService workflowService = SpringContextService.getBean( fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService.BEAN_SERVICE );
+        WorkflowFilter workflowFilter = new WorkflowFilter( );
 
-		            for ( Action action : listAutomaticActions )
-		            {
-		            	ResourceWorkflowFilter filt= new ResourceWorkflowFilter();
-		            	filt.setIdState(action.getStateBefore().getId());
-		            	filt.setIdWorkflow(workflow.getId(  ));
-		            	filt.setResourceType(Appointment.APPOINTMENT_RESOURCE_TYPE);
-		            	
-		                List<ResourceWorkflow> listResource = resourceWorkflowService.getListResourceWorkflowByFilter(filt);
-		                
-		                for ( ResourceWorkflow resource : listResource )
-		                {
-		                	try{
-		                	_taskReminder.sendReminder(resource.getIdResource(  ),resource.getResourceType(  ), action.getId(  ), workflow.getId()  );
-		                    
-		                	}catch(Exception e){
-		                		
-		                		AppLogService.error( "notify reminder appointment", e);
-		                	}
+        workflowFilter.setIsEnabled( 1 );
 
-		                }
-		            }
-		        }
-		    }
-		
-		}
+        List<Workflow> listWorkflows = workflowService.getListWorkflowsByFilter( workflowFilter );
+        IResourceWorkflowService resourceWorkflowService = SpringContextService.getBean( ResourceWorkflowService.BEAN_SERVICE );
+
+        for ( Workflow workflow : listWorkflows )
+        {
+            IActionService actionService = SpringContextService.getBean( ActionService.BEAN_SERVICE );
+            ActionFilter filter = new ActionFilter( );
+
+            filter.setAutomaticReflexiveAction( true );
+            filter.setIdWorkflow( workflow.getId( ) );
+
+            List<Action> listAutomaticActions = actionService.getListActionByFilter( filter );
+
+            for ( Action action : listAutomaticActions )
+            {
+                ResourceWorkflowFilter filt = new ResourceWorkflowFilter( );
+                filt.setIdState( action.getStateBefore( ).getId( ) );
+                filt.setIdWorkflow( workflow.getId( ) );
+                filt.setResourceType( Appointment.APPOINTMENT_RESOURCE_TYPE );
+
+                List<ResourceWorkflow> listResource = resourceWorkflowService.getListResourceWorkflowByFilter( filt );
+
+                for ( ResourceWorkflow resource : listResource )
+                {
+                    try
+                    {
+                        _taskReminder.sendReminder( resource.getIdResource( ), resource.getResourceType( ), action.getId( ), workflow.getId( ) );
+
+                    }
+                    catch( Exception e )
+                    {
+
+                        AppLogService.error( "notify reminder appointment", e );
+                    }
+
+                }
+            }
+        }
+    }
+
+}

@@ -47,40 +47,43 @@ import java.util.Map;
 
 public class TaskNotifyReminderConfigService extends TaskConfigService implements ITaskNotifyReminderConfigService
 {
-	
+
     public static final String BEAN_SERVICE = "genericalert.taskNotifyReminderConfigService";
-    
+
     @Override
-	public List<TaskNotifyReminderConfig> findAll( ) 
-	{
-		return null;
-	}
-	@Override
-	public void selectUpdate( TaskNotifyReminderConfig config, String strIdEntry, int idParentEntry )
-	{
-		
-	}
-	@Override
-	public void unSelectUpdate( TaskNotifyReminderConfig config, String strIdEntry, int idParentEntry ) 
-	{
-		
-	}
-	@Override
-	public Map<Integer, List<Integer>> loadSelectedList( int idTask, int idDirectory )
-	{
-		return null;
-	}
-	@Override
-	public void selectedRecords( TaskNotifyReminderConfig config ) 
-	{
-		
-	}
-	@Override
-	public void loadListEntriesTmp( int idTask, int idDirectory ) 
-	{
-		
-	}
-	
+    public List<TaskNotifyReminderConfig> findAll( )
+    {
+        return null;
+    }
+
+    @Override
+    public void selectUpdate( TaskNotifyReminderConfig config, String strIdEntry, int idParentEntry )
+    {
+
+    }
+
+    @Override
+    public void unSelectUpdate( TaskNotifyReminderConfig config, String strIdEntry, int idParentEntry )
+    {
+
+    }
+
+    @Override
+    public Map<Integer, List<Integer>> loadSelectedList( int idTask, int idDirectory )
+    {
+        return null;
+    }
+
+    @Override
+    public void selectedRecords( TaskNotifyReminderConfig config )
+    {
+
+    }
+
+    @Override
+    public void loadListEntriesTmp( int idTask, int idDirectory )
+    {
+
+    }
+
 }
-
-

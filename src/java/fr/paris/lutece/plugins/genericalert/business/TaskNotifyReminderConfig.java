@@ -37,71 +37,80 @@ import java.util.List;
 
 import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
 
-
 /**
  * This is the business class for the object TaskReminderConfig
- */ 
+ */
 public class TaskNotifyReminderConfig extends TaskConfig
 {
-    // Variables declarations 
-   
+    // Variables declarations
+
     private int _nNbAlerts;
-    
-    private int _nIdForm ;
-    
-    private List < ReminderAppointment > _listReminderAppointment;
-    
+
+    private int _nIdForm;
+
+    private List<ReminderAppointment> _listReminderAppointment;
+
     /**
      * Get number Alerts
+     * 
      * @return number Alerts
      */
-	public int getNbAlerts( ) 
-	{
-		return _nNbAlerts;
-	}
-	/**
-	 * Set number Alerts
-	 * @param nNbAlerts of alerts
-	 */
-	public void setNbAlerts( int nNbAlerts )
-	{
-		this._nNbAlerts = nNbAlerts;
-	}
-	
-	/**
-	 * Get the id form
-	 * @return id form
-	 */
-	public int getIdForm( ) 
-	{
-		return _nIdForm;
-	}
-	
-	/**
-	 * Set id form
-	 * @param nIdForm the id form
-	 */
-	public void setIdForm( int nIdForm ) 
-	{
-		this._nIdForm = nIdForm;
-	}
-	
-	/**
-	 * Get list ReminderAppointment
-	 * @return list ReminderAppointment the list of reminders
-	 */
-	public List< ReminderAppointment > getListReminderAppointment( )
-	{
-		return _listReminderAppointment;
-	}
-	
-	/**
-	 * Set list ReminderAppointment
-	 * @param listReminderAppointment the list of reminders
-	 */
-	public void setListReminderAppointment( List< ReminderAppointment > listReminderAppointment )
-	{
-		this._listReminderAppointment = listReminderAppointment;
-	}
-    
+    public int getNbAlerts( )
+    {
+        return _nNbAlerts;
+    }
+
+    /**
+     * Set number Alerts
+     * 
+     * @param nNbAlerts
+     *            of alerts
+     */
+    public void setNbAlerts( int nNbAlerts )
+    {
+        this._nNbAlerts = nNbAlerts;
+    }
+
+    /**
+     * Get the id form
+     * 
+     * @return id form
+     */
+    public int getIdForm( )
+    {
+        return _nIdForm;
+    }
+
+    /**
+     * Set id form
+     * 
+     * @param nIdForm
+     *            the id form
+     */
+    public void setIdForm( int nIdForm )
+    {
+        this._nIdForm = nIdForm;
+    }
+
+    /**
+     * Get list ReminderAppointment
+     * 
+     * @return list ReminderAppointment the list of reminders
+     */
+    public List<ReminderAppointment> getListReminderAppointment( )
+    {
+        return _listReminderAppointment;
+    }
+
+    /**
+     * Set list ReminderAppointment
+     * 
+     * @param listReminderAppointment
+     *            the list of reminders
+     */
+    public void setListReminderAppointment( List<ReminderAppointment> listReminderAppointment )
+    {
+        this._listReminderAppointment = listReminderAppointment;
+    }
+
 }
