@@ -155,22 +155,21 @@ public class TaskNotifyReminder extends SimpleTask
 			
 		        Action action = _actionService.findByPrimaryKey( nIdAction );		         
 		        State stateBefore = action.getStateBefore( ) ;
-				
+		        TaskNotifyReminderConfig config=null;
 				Date date = new Date();
 		        Calendar calendar = new GregorianCalendar(  );
 		        calendar.setTime( date );
 		        Timestamp timestampDay = new Timestamp( calendar.getTimeInMillis(  ) );
-
-					TaskNotifyReminderConfig config = TaskNotifyReminderConfigHome.findByPrimaryKey( task.getId(  ) );
-					
-					if ( config != null )
-					{
-						List <ReminderAppointment> listReminders = null ;
-					
-						Appointment appointment= AppointmentHome.findByPrimaryKey(nIdResource);
-			    	
-						AppointmentSlot slot= AppointmentSlotHome.findByPrimaryKey(appointment.getIdSlot());
-						
+				Appointment appointment= AppointmentHome.findByPrimaryKey(nIdResource);
+				AppointmentSlot slot= AppointmentSlotHome.findByPrimaryKey(appointment.getIdSlot());
+				
+				if(slot != null ){
+				           
+					config = TaskNotifyReminderConfigHome.findByIdForm( task.getId(  ),slot.getIdForm( ) );
+				}	
+				if ( config != null )
+				{
+						List <ReminderAppointment> listReminders = null;					
 						if(appointment != null && AppointmentFormHome.findByPrimaryKey(slot.getIdForm()).getIsActive( )){
 				        	Calendar cal2 = new GregorianCalendar(  );
 				        	Date startAppointment = appointment.getStartAppointment( ) ;
