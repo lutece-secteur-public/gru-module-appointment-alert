@@ -166,7 +166,13 @@ public class TaskNotifyReminder extends SimpleTask
             calendar.setTime( date );
             Timestamp timestampDay = new Timestamp( calendar.getTimeInMillis( ) );
             Appointment appointment = AppointmentHome.findByPrimaryKey( nIdResource );
-            AppointmentSlot slot = AppointmentSlotHome.findByPrimaryKey( appointment.getIdSlot( ) );
+            AppointmentSlot slot= null;
+            
+            if(appointment != null ){
+                slot = AppointmentSlotHome.findByPrimaryKey( appointment.getIdSlot( ) );
+
+            }
+            
 
             if ( slot != null )
             {
