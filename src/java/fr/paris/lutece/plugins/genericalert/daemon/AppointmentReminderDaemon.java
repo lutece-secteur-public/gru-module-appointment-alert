@@ -102,7 +102,7 @@ public class AppointmentReminderDaemon extends Daemon
                     catch( Exception e )
                     {
 
-                        AppLogService.error( "notify reminder appointment", e );
+                        AppLogService.error( "notify reminder appointment: " +e.getMessage()+ ": "+e, e );
                     }
 
                 }
