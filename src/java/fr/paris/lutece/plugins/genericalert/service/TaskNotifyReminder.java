@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -193,11 +194,12 @@ public class TaskNotifyReminder extends SimpleTask
 
                     if ( timeStartDate.getTime( ) > timestampDay.getTime( ) && stateAppointment != null && stateAppointment.getId( ) == stateBefore.getId( ) )
                     {
-                        long lDiffTimeStamp = Math.abs( timestampDay.getTime( ) - timeStartDate.getTime( ) );
+                    	long minutes = Math.abs(TimeUnit.MILLISECONDS.toMinutes(timestampDay.getTime( ) - timeStartDate.getTime( )));
+                     /*   long lDiffTimeStamp = Math.abs( timestampDay.getTime( ) - timeStartDate.getTime( ) );
                         int nDays = (int) lDiffTimeStamp / ( 1000 * 60 * 60 * 24 );
                         int nDiffHours = ( (int) lDiffTimeStamp / ( 60 * 60 * 1000 ) % 24 ) + ( nDays * 24 );
                         int nDiffMin = ( nDiffHours * 60 ) + (int) ( lDiffTimeStamp / ( 60 * 1000 ) % 60 );
-
+						*/
                         if ( config.getNbAlerts( ) > 0 )
                         {
                             listReminders = config.getListReminderAppointment( );
@@ -205,7 +207,7 @@ public class TaskNotifyReminder extends SimpleTask
 
                         for ( ReminderAppointment reminder : listReminders )
                         {
-                            sendReminder( appointment, reminder, startAppointment, nDiffMin, nIdWorkflow, config, strResourceType, nIdAction );
+                            sendReminder( appointment, reminder, startAppointment, minutes, nIdWorkflow, config, strResourceType, nIdAction );
                         }
                     }
                 }
@@ -228,13 +230,13 @@ public class TaskNotifyReminder extends SimpleTask
      * @param config
      *            the task config
      */
-    private void sendReminder( Appointment appointment, ReminderAppointment reminder, Date startAppointment, int nDiffMin, int nIdWorkflow,
+    private void sendReminder( Appointment appointment, ReminderAppointment reminder, Date startAppointment, long nDiffMin, int nIdWorkflow,
             TaskNotifyReminderConfig config, String strResourceType, int nIdAction )
     {
         int nInterval = Integer.parseInt( AppPropertiesService.getProperty( MARK_DURATION_LIMIT ) );
 
-        int nMinTime = ( reminder.getTimeToAlert( ) * 60 * 24 ) - nInterval;
-        int nMaxTime = ( reminder.getTimeToAlert( ) * 60 * 24 ) + nInterval;
+        long nMinTime = ( reminder.getTimeToAlert( ) * 60 * 24 ) - nInterval;
+        long nMaxTime = ( reminder.getTimeToAlert( ) * 60 * 24 ) + nInterval;
 
         if ( nDiffMin <= nMaxTime && nDiffMin >= nMinTime
                 && ( ( appointment.getHasNotify( ) == 0 ) || ( appointment.getHasNotify( ) != ( reminder.getRank( ) ) ) ) )
