@@ -35,7 +35,7 @@ package fr.paris.lutece.plugins.genericalert.daemon;
 
 import java.util.List;
 
-import fr.paris.lutece.plugins.appointment.business.Appointment;
+import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
 import fr.paris.lutece.plugins.genericalert.service.TaskNotifyReminder;
 import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.action.ActionFilter;
@@ -80,7 +80,7 @@ public class AppointmentReminderDaemon extends Daemon
 
             filter.setAutomaticReflexiveAction( true );
             filter.setIdWorkflow( workflow.getId( ) );
-            
+
             List<Action> listAutomaticActions = actionService.getListActionByFilter( filter );
 
             for ( Action action : listAutomaticActions )
@@ -102,7 +102,7 @@ public class AppointmentReminderDaemon extends Daemon
                     catch( Exception e )
                     {
 
-                        AppLogService.error( "notify reminder appointment: " +e.getMessage()+ ": "+e, e );
+                        AppLogService.error( "notify reminder appointment: " + e.getMessage( ) + ": " + e, e );
                     }
 
                 }
