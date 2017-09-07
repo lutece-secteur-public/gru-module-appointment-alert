@@ -167,13 +167,13 @@ public class TaskNotifyReminder extends SimpleTask
             calendar.setTime( date );
             Timestamp timestampDay = new Timestamp( calendar.getTimeInMillis( ) );
             Appointment appointment = AppointmentHome.findByPrimaryKey( nIdResource );
-            AppointmentSlot slot= null;
-            
-            if(appointment != null ){
+            AppointmentSlot slot = null;
+
+            if ( appointment != null )
+            {
                 slot = AppointmentSlotHome.findByPrimaryKey( appointment.getIdSlot( ) );
 
             }
-            
 
             if ( slot != null )
             {
@@ -194,12 +194,12 @@ public class TaskNotifyReminder extends SimpleTask
 
                     if ( timeStartDate.getTime( ) > timestampDay.getTime( ) && stateAppointment != null && stateAppointment.getId( ) == stateBefore.getId( ) )
                     {
-                    	long minutes = Math.abs(TimeUnit.MILLISECONDS.toMinutes(timestampDay.getTime( ) - timeStartDate.getTime( )));
-                     /*   long lDiffTimeStamp = Math.abs( timestampDay.getTime( ) - timeStartDate.getTime( ) );
-                        int nDays = (int) lDiffTimeStamp / ( 1000 * 60 * 60 * 24 );
-                        int nDiffHours = ( (int) lDiffTimeStamp / ( 60 * 60 * 1000 ) % 24 ) + ( nDays * 24 );
-                        int nDiffMin = ( nDiffHours * 60 ) + (int) ( lDiffTimeStamp / ( 60 * 1000 ) % 60 );
-						*/
+                        long minutes = Math.abs( TimeUnit.MILLISECONDS.toMinutes( timestampDay.getTime( ) - timeStartDate.getTime( ) ) );
+                        /*
+                         * long lDiffTimeStamp = Math.abs( timestampDay.getTime( ) - timeStartDate.getTime( ) ); int nDays = (int) lDiffTimeStamp / ( 1000 * 60
+                         * * 60 * 24 ); int nDiffHours = ( (int) lDiffTimeStamp / ( 60 * 60 * 1000 ) % 24 ) + ( nDays * 24 ); int nDiffMin = ( nDiffHours * 60 )
+                         * + (int) ( lDiffTimeStamp / ( 60 * 1000 ) % 60 );
+                         */
                         if ( config.getNbAlerts( ) > 0 )
                         {
                             listReminders = config.getListReminderAppointment( );

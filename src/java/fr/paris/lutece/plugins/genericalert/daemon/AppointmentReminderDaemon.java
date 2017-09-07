@@ -80,7 +80,7 @@ public class AppointmentReminderDaemon extends Daemon
 
             filter.setAutomaticReflexiveAction( true );
             filter.setIdWorkflow( workflow.getId( ) );
-            
+
             List<Action> listAutomaticActions = actionService.getListActionByFilter( filter );
 
             for ( Action action : listAutomaticActions )
@@ -102,7 +102,7 @@ public class AppointmentReminderDaemon extends Daemon
                     catch( Exception e )
                     {
 
-                        AppLogService.error( "notify reminder appointment: " +e.getMessage()+ ": "+e, e );
+                        AppLogService.error( "notify reminder appointment: " + e.getMessage( ) + ": " + e, e );
                     }
 
                 }
