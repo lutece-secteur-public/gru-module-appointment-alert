@@ -181,7 +181,7 @@ public class TaskNotifyReminder extends SimpleTask
             if ( config != null )
             {
                 List<ReminderAppointment> listReminders = null;
-                if ( appointment != null && FormService.findFormLightByPrimaryKey( slot.getIdForm( ) ).isActive( ) )
+                if ( appointment != null && FormService.findFormLightByPrimaryKey( slot.getIdForm( ) ).getIsActive( ) )
                 {
                     Timestamp timeStartDate = slot.getStartingTimestampDate( );
                     State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, nIdWorkflow );
