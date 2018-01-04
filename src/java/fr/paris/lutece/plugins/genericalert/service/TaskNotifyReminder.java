@@ -34,8 +34,7 @@
 package fr.paris.lutece.plugins.genericalert.service;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -138,7 +137,7 @@ public class TaskNotifyReminder extends SimpleTask
     @Inject
     private IResourceWorkflowService _resourceWorkflowService;
 
-    IWorkflowService workflowService = SpringContextService.getBean( fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService.BEAN_SERVICE );
+    IWorkflowService _workflowService = SpringContextService.getBean( fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService.BEAN_SERVICE );
 
     @Override
     public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
@@ -294,7 +293,6 @@ public class TaskNotifyReminder extends SimpleTask
                 {
                     AppointmentService.updateAppointment( appointment );
                     doChangeState( config, reminder, nIdWorkflow, appointment );
-                    workflowService.doProcessAction( appointment.getIdAppointment( ), strResourceType, nIdAction, null, null, Locale.getDefault( ), true, null );
                 }
                 catch( Exception e )
                 {
@@ -371,8 +369,8 @@ public class TaskNotifyReminder extends SimpleTask
      */
     private String getMessageAppointment( String msg, Appointment appointment )
     {
-        DateFormat formater = DateFormat.getDateInstance( DateFormat.FULL, Locale.FRENCH );
-        SimpleDateFormat formatTime = new SimpleDateFormat( "HH:mm" );
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern( "dd LLLL yyyy" );
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern( "HH:mm" );
         String strText = StringUtils.EMPTY;
         User user = UserService.findUserById( appointment.getIdUser( ) );
         Slot slot = SlotService.findSlotById( appointment.getIdSlot( ) );
@@ -384,8 +382,8 @@ public class TaskNotifyReminder extends SimpleTask
         }
         strText = msg.replace( MARK_FIRST_NAME, user.getFirstName( ) );
         strText = strText.replace( MARK_LAST_NAME, user.getLastName( ) );
-        strText = strText.replace( MARK_DATE_APP, formater.format( slot.getDate( ) ) );
-        strText = strText.replace( MARK_TIME_APP, formatTime.format( slot.getStartingDateTime( ) ) );
+        strText = strText.replace( MARK_DATE_APP, slot.getDate( ).format( dateFormatter ) );
+        strText = strText.replace( MARK_TIME_APP, slot.getStartingDateTime( ).format( timeFormatter ) );
         strText = strText.replace( MARK_LOCALIZATION, strLocation );
         strText = strText.replace( MARK_CANCEL_APP, AppointmentApp.getCancelAppointmentUrl( appointment ) );
 
@@ -433,7 +431,10 @@ public class TaskNotifyReminder extends SimpleTask
 
                 resourceWorkflow.setState( state );
                 _resourceWorkflowService.update( resourceWorkflow );
-
+                // Execute the relative tasks of the state in the workflow
+                // We use AutomaticReflexiveActions because we don't want to change the state of the resource by executing actions.
+                _workflowService.doProcessAutomaticReflexiveActions( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, state.getId( ),
+                        null, locale );
             }
         }
     }
