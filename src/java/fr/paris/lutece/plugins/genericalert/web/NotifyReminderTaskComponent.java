@@ -46,7 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
-import fr.paris.lutece.plugins.appointment.business.AppointmentFormHome;
+import fr.paris.lutece.plugins.appointment.service.FormService;
 import fr.paris.lutece.plugins.appointment.service.entrytype.EntryTypePhone;
 import fr.paris.lutece.plugins.genericalert.business.ReminderAppointment;
 import fr.paris.lutece.plugins.genericalert.business.TaskNotifyReminderConfig;
@@ -64,6 +64,7 @@ import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.state.StateService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.portal.service.datastore.DatastoreService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
@@ -71,7 +72,6 @@ import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
-import fr.paris.lutece.portal.service.datastore.DatastoreService;
 
 /**
  *
@@ -122,7 +122,8 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
 
     // properties
     private static final String PROPERTY_MAX_LENGTH_SMS_TEXT = "genericalert.maxLength.textSms";
-    // private IStateService _stateService = SpringContextService.getBean( StateService.BEAN_SERVICE );
+    // private IStateService _stateService = SpringContextService.getBean(
+    // StateService.BEAN_SERVICE );
 
     @Inject
     @Named( StateService.BEAN_SERVICE )
@@ -154,11 +155,11 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
             config = TaskNotifyReminderConfigHome.findByIdForm( task.getId( ), nIdForm );
         }
 
-        List<AppointmentForm> listForms = AppointmentFormHome.getActiveAppointmentFormsList( );
+        List<AppointmentForm> listForms = FormService.buildAllActiveAppointmentForm( );
         List<String> listTel = getListPhoneEntries( nIdForm );
         List<State> listStates = null;
 
-        AppointmentForm tmpForm = AppointmentFormHome.findByPrimaryKey( nIdForm );
+        AppointmentForm tmpForm = FormService.buildAppointmentFormLight( nIdForm );
         if ( tmpForm != null )
         {
             StateFilter stateFilter = new StateFilter( );

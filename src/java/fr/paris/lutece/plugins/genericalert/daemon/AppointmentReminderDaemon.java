@@ -35,7 +35,7 @@ package fr.paris.lutece.plugins.genericalert.daemon;
 
 import java.util.List;
 
-import fr.paris.lutece.plugins.appointment.business.Appointment;
+import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
 import fr.paris.lutece.plugins.genericalert.service.TaskNotifyReminder;
 import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.action.ActionFilter;
