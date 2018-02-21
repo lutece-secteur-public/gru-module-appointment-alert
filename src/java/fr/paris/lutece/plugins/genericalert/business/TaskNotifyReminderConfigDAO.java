@@ -34,13 +34,13 @@
 
 package fr.paris.lutece.plugins.genericalert.business;
 
-import fr.paris.lutece.plugins.genericalert.service.NotifyReminderPlugin;
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.util.sql.DAOUtil;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import fr.paris.lutece.plugins.genericalert.service.NotifyReminderPlugin;
+import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.util.sql.DAOUtil;
 
 /**
  * This class provides Data Access methods for TaskReminderConfig objects
@@ -85,8 +85,8 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
         if ( taskReminderConfig != null )
         {
             if ( taskReminderConfig.getListReminderAppointment( ).size( ) > 0 )
-            {
-                insertListReminderAppointment( taskReminderConfig.getListReminderAppointment( ), NotifyReminderPlugin.getPlugin( ) );
+            {            	
+                insertListReminderAppointment( taskReminderConfig.getIdTask(), taskReminderConfig.getListReminderAppointment( ), NotifyReminderPlugin.getPlugin( ) );
             }
         }
     }
@@ -379,12 +379,12 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
      * @param plugin
      *            the plugin
      */
-    private void insertReminderAppointment( ReminderAppointment reminderAppointment, Plugin plugin )
+    private void insertReminderAppointment( int nIdTask, ReminderAppointment reminderAppointment, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_REMINDER_APPOINTMENT_FORM_MESSAGE, plugin );
         int nIndex = 1;
 
-        daoUtil.setInt( nIndex++, reminderAppointment.getIdTask( ) );
+        daoUtil.setInt( nIndex++, nIdTask );
         daoUtil.setInt( nIndex++, reminderAppointment.getIdForm( ) );
         daoUtil.setInt( nIndex++, reminderAppointment.getRank( ) );
         daoUtil.setInt( nIndex++, reminderAppointment.getTimeToAlert( ) );
@@ -408,11 +408,11 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
      * @param plugin
      *            the plugin
      */
-    private void insertListReminderAppointment( List<ReminderAppointment> listReminderAppointment, Plugin plugin )
+    private void insertListReminderAppointment( int nIdTask, List<ReminderAppointment> listReminderAppointment, Plugin plugin )
     {
         for ( ReminderAppointment reminderAppointment : listReminderAppointment )
         {
-            insertReminderAppointment( reminderAppointment, plugin );
+            insertReminderAppointment( nIdTask, reminderAppointment, plugin );
         }
     }
 
@@ -433,7 +433,7 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
         {
             if ( loadReminderAppointment( idTask, reminderAppointment.getIdForm( ), reminderAppointment.getRank( ), plugin ) == null )
             {
-                insertReminderAppointment( reminderAppointment, plugin );
+                insertReminderAppointment( idTask, reminderAppointment, plugin );
             }
             else
             {
