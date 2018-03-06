@@ -119,6 +119,9 @@ public class TaskNotifyReminder extends SimpleTask
     private static final String PROPERTY_MAIL_SENDER_NAME = "genericalert.task_notify_reminder.mailSenderName";
     private static final String MESSAGE_MARK_DESCRIPTION = "genericalert.task_notify_reminder.description";
 
+    public static final String FORMAT_DATE = "dd/MM/yyyy";
+    public static final String FORMAT_TIME = "HH:mm";
+    
     // service
     private final StateService _stateService = SpringContextService.getBean( StateService.BEAN_SERVICE );
     @Inject
@@ -369,8 +372,8 @@ public class TaskNotifyReminder extends SimpleTask
      */
     private String getMessageAppointment( String msg, Appointment appointment )
     {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern( "dd LLLL yyyy" );
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern( "HH:mm" );
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern( FORMAT_DATE );
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern( FORMAT_TIME );
         String strText = StringUtils.EMPTY;
         User user = UserService.findUserById( appointment.getIdUser( ) );
         Slot slot = SlotService.findSlotById( appointment.getIdSlot( ) );
