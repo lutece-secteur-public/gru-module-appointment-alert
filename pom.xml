@@ -7,7 +7,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.paris.lutece.plugins</groupId>
-    <artifactId>module-appt-alert</artifactId>
+    <artifactId>module-appointment-alert</artifactId>
     <packaging>lutece-plugin</packaging>
     <version>2.0.2-SNAPSHOT</version>
     <name>Lutece appointment alert module</name>
