@@ -45,9 +45,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 
-import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
 import fr.paris.lutece.plugins.appointment.service.FormService;
 import fr.paris.lutece.plugins.appointment.service.entrytype.EntryTypePhone;
+import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFormDTO;
 import fr.paris.lutece.plugins.genericalert.business.ReminderAppointment;
 import fr.paris.lutece.plugins.genericalert.business.TaskNotifyReminderConfig;
 import fr.paris.lutece.plugins.genericalert.business.TaskNotifyReminderConfigHome;
@@ -155,11 +155,11 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
             config = TaskNotifyReminderConfigHome.findByIdForm( task.getId( ), nIdForm );
         }
 
-        List<AppointmentForm> listForms = FormService.buildAllActiveAppointmentForm( );
+        List<AppointmentFormDTO> listForms = FormService.buildAllActiveAppointmentForm( );
         List<String> listTel = getListPhoneEntries( nIdForm );
         List<State> listStates = null;
 
-        AppointmentForm tmpForm = FormService.buildAppointmentFormLight( nIdForm );
+        AppointmentFormDTO tmpForm = FormService.buildAppointmentFormLight( nIdForm );
         if ( tmpForm != null )
         {
             StateFilter stateFilter = new StateFilter( );
@@ -394,7 +394,7 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
 
         EntryFilter entryFilter = new EntryFilter( );
         entryFilter.setIdResource( idForm );
-        entryFilter.setResourceType( AppointmentForm.RESOURCE_TYPE );
+        entryFilter.setResourceType( AppointmentFormDTO.RESOURCE_TYPE );
         entryFilter.setFieldDependNull( EntryFilter.FILTER_TRUE );
         List<Entry> listEntries = EntryHome.getEntryList( entryFilter );
         for ( Entry entry : listEntries )
