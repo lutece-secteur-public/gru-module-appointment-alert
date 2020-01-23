@@ -109,14 +109,19 @@ public class TaskNotifyReminder extends SimpleTask
     private static final String MARK_TIME_APP = "${time_appointment}";
     private static final String MARK_LOCALIZATION = "${localisation}";
     private static final String MARK_CANCEL_APP = "${url_cancel}";
-    private static final String MARK_PREFIX_SENDER = "@contact-everyone.fr";
-    private static final String MARK_SENDER_SMS = "magali.lemaire@paris.fr";
+    private static final String DEFAULT_PREFIX_SENDER = "@contact-everyone.fr";
+    private static final String DEFAULT_SENDER_SMS = "magali.lemaire@paris.fr";
     private static final String MARK_REGEX_SMS = "^(06|07)[0-9]{8}$";
     private static final String USER_AUTO = "auto";
     private static final String MARK_DURATION_LIMIT = "daemon.reminder.interval";
 
     // properties
     private static final String PROPERTY_MAIL_SENDER_NAME = "genericalert.task_notify_reminder.mailSenderName";
+    private static final String PROPERTY_SENDER_SMS = "genericalert.senderSms";
+    private static final String PROPERTY_PREFIX_SMS_SENDER = "genericalert.prefixSenderSms";
+    
+    
+    
     private static final String MESSAGE_MARK_DESCRIPTION = "genericalert.task_notify_reminder.description";
 
     public static final String FORMAT_DATE = "dd/MM/yyyy";
@@ -277,9 +282,13 @@ public class TaskNotifyReminder extends SimpleTask
                 {
                     try
                     {
-                        strRecipient += MARK_PREFIX_SENDER;
-
-                        MailService.sendMailHtml( strRecipient, strSenderName, MARK_SENDER_SMS, reminder.getAlertSubject( ), strSmsText );
+                        
+                        String strDefaultRecipientSms=AppPropertiesService.getProperty( PROPERTY_PREFIX_SMS_SENDER, DEFAULT_PREFIX_SENDER );
+                        String strSenderSms=AppPropertiesService.getProperty( PROPERTY_SENDER_SMS,DEFAULT_SENDER_SMS );
+                        
+                        strRecipient += strDefaultRecipientSms;
+                            
+                        MailService.sendMailHtml( strRecipient, strSenderName, strSenderSms, reminder.getAlertSubject( ), strSmsText );
                         bNotified = true;
                     }
                     catch( Exception e )
