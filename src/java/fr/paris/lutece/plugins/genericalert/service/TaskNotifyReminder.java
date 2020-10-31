@@ -51,16 +51,15 @@ import org.apache.commons.lang.StringUtils;
 
 import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
 import fr.paris.lutece.plugins.appointment.business.localization.Localization;
-import fr.paris.lutece.plugins.appointment.business.slot.Slot;
 import fr.paris.lutece.plugins.appointment.business.user.User;
 import fr.paris.lutece.plugins.appointment.service.AppointmentResponseService;
 import fr.paris.lutece.plugins.appointment.service.AppointmentService;
 import fr.paris.lutece.plugins.appointment.service.FormService;
 import fr.paris.lutece.plugins.appointment.service.LocalizationService;
-import fr.paris.lutece.plugins.appointment.service.SlotService;
 import fr.paris.lutece.plugins.appointment.service.UserService;
 import fr.paris.lutece.plugins.appointment.service.entrytype.EntryTypePhone;
 import fr.paris.lutece.plugins.appointment.web.AppointmentApp;
+import fr.paris.lutece.plugins.appointment.web.dto.AppointmentDTO;
 import fr.paris.lutece.plugins.genericalert.business.ReminderAppointment;
 import fr.paris.lutece.plugins.genericalert.business.TaskNotifyReminderConfig;
 import fr.paris.lutece.plugins.genericalert.business.TaskNotifyReminderConfigHome;
@@ -119,7 +118,6 @@ public class TaskNotifyReminder extends SimpleTask
     private static final String PROPERTY_MAIL_SENDER_NAME = "genericalert.task_notify_reminder.mailSenderName";
     private static final String MESSAGE_MARK_DESCRIPTION = "genericalert.task_notify_reminder.description";
 
-    public static final String FORMAT_DATE = "dd/MM/yyyy";
     public static final String FORMAT_TIME = "HH:mm";
     
     // service
@@ -170,22 +168,19 @@ public class TaskNotifyReminder extends SimpleTask
             Calendar calendar = new GregorianCalendar( );
             calendar.setTime( date );
             Timestamp timestampDay = new Timestamp( calendar.getTimeInMillis( ) );
-            Appointment appointment = AppointmentService.findAppointmentById( nIdResource );
-            Slot slot = null;
+            AppointmentDTO appointment = AppointmentService.buildAppointmentDTOFromIdAppointment( nIdResource );
+            
             if ( appointment != null )
             {
-                slot = SlotService.findSlotById( appointment.getIdSlot( ) );
+                config = TaskNotifyReminderConfigHome.findByIdForm( task.getId( ), appointment.getIdForm( ) );
             }
-            if ( slot != null )
-            {
-                config = TaskNotifyReminderConfigHome.findByIdForm( task.getId( ), slot.getIdForm( ) );
-            }
+            
             if ( config != null )
             {
                 List<ReminderAppointment> listReminders = null;
-                if ( appointment != null && FormService.findFormLightByPrimaryKey( slot.getIdForm( ) ).getIsActive( ) )
+                if ( FormService.findFormLightByPrimaryKey( appointment.getIdForm( ) ).getIsActive( ) )
                 {
-                    Timestamp timeStartDate = slot.getStartingTimestampDate( );
+                    Timestamp timeStartDate = Timestamp.valueOf( appointment.getStartingDateTime( ));
                     State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, nIdWorkflow );
                     if ( timeStartDate.getTime( ) > timestampDay.getTime( ) && stateAppointment != null && stateAppointment.getId( ) == stateBefore.getId( ) )
                     {
@@ -225,7 +220,7 @@ public class TaskNotifyReminder extends SimpleTask
      * @param config
      *            the task config
      */
-    private void sendReminder( Appointment appointment, ReminderAppointment reminder, Date startAppointment, long nDiffMin, int nIdWorkflow,
+    private void sendReminder( AppointmentDTO appointment, ReminderAppointment reminder, Date startAppointment, long nDiffMin, int nIdWorkflow,
             TaskNotifyReminderConfig config, String strResourceType, int nIdAction )
     {
         int nInterval = Integer.parseInt( AppPropertiesService.getProperty( MARK_DURATION_LIMIT ) );
@@ -316,15 +311,14 @@ public class TaskNotifyReminder extends SimpleTask
      *            the reminder task
      * @return the sms number
      */
-    private String getSmsFromAppointment( Appointment appointment, ReminderAppointment reminder )
+    private String getSmsFromAppointment( AppointmentDTO appointment, ReminderAppointment reminder )
     {
         String strPhoneNumber = StringUtils.EMPTY;
-        Slot slot = SlotService.findSlotById( appointment.getIdSlot( ) );
         EntryFilter entryFilter = new EntryFilter( );
-        entryFilter.setIdResource( slot.getIdForm( ) );
+        entryFilter.setIdResource( appointment.getIdForm( ) );
 
         List<Integer> listIdResponse = AppointmentResponseService.findListIdResponse( appointment.getIdAppointment( ) );
-        List<Response> listResponses = new ArrayList<Response>( listIdResponse.size( ) );
+        List<Response> listResponses = new ArrayList< >( listIdResponse.size( ) );
         for ( int nIdResponse : listIdResponse )
         {
             Response response = ResponseHome.findByPrimaryKey( nIdResponse );
@@ -370,14 +364,12 @@ public class TaskNotifyReminder extends SimpleTask
      *            the appointment
      * @return the text message
      */
-    private String getMessageAppointment( String msg, Appointment appointment )
+    private String getMessageAppointment( String msg, AppointmentDTO appointment )
     {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern( FORMAT_DATE );
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern( FORMAT_TIME );
         String strText = StringUtils.EMPTY;
         User user = UserService.findUserById( appointment.getIdUser( ) );
-        Slot slot = SlotService.findSlotById( appointment.getIdSlot( ) );
-        Localization localization = LocalizationService.findLocalizationWithFormId( slot.getIdForm( ) );
+        Localization localization = LocalizationService.findLocalizationWithFormId( appointment.getIdForm( ) );
         String strLocation = StringUtils.EMPTY;
         if ( localization != null && localization.getAddress( ) != null )
         {
@@ -385,8 +377,8 @@ public class TaskNotifyReminder extends SimpleTask
         }
         strText = msg.replace( MARK_FIRST_NAME, user.getFirstName( ) );
         strText = strText.replace( MARK_LAST_NAME, user.getLastName( ) );
-        strText = strText.replace( MARK_DATE_APP, slot.getDate( ).format( dateFormatter ) );
-        strText = strText.replace( MARK_TIME_APP, slot.getStartingDateTime( ).format( timeFormatter ) );
+        strText = strText.replace( MARK_DATE_APP, appointment.getDateOfTheAppointment( ) );
+        strText = strText.replace( MARK_TIME_APP, appointment.getStartingDateTime( ).format( timeFormatter ) );
         strText = strText.replace( MARK_LOCALIZATION, strLocation );
         strText = strText.replace( MARK_CANCEL_APP, AppointmentApp.getCancelAppointmentUrl( appointment ) );
 
