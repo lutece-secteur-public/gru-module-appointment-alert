@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -269,17 +269,17 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
                     String strTimeToAlert = request.getParameter( MARK_TIME_ALERT + i );
                     String strEmailNotify = request.getParameter( MARK_EMAIL_NOTIFY + i ) == null ? MARK_FALSE : request.getParameter( MARK_EMAIL_NOTIFY + i );
                     String strSmsNotify = request.getParameter( MARK_SMS_NOTIFY + i ) == null ? MARK_FALSE : request.getParameter( MARK_SMS_NOTIFY + i );
-                    String strEmailAlertMessage = request.getParameter( MARK_EMAIL_ALERT_MESSAGE + i ) == null ? StringUtils.EMPTY : request
-                            .getParameter( MARK_EMAIL_ALERT_MESSAGE + i );
-                    String strSmsAlertMessage = request.getParameter( MARK_SMS_ALERT_MESSAGE + i ) == null ? StringUtils.EMPTY : request
-                            .getParameter( MARK_SMS_ALERT_MESSAGE + i );
-                    String strAlertSubject = request.getParameter( MARK_ALERT_SUBJECT + i ) == null ? StringUtils.EMPTY : request
-                            .getParameter( MARK_ALERT_SUBJECT + i );
-                    String strPhoneNumber = request.getParameter( MARK_NUMBER_PHONE + i ) == null ? StringUtils.EMPTY : request.getParameter( MARK_NUMBER_PHONE
-                            + i );
+                    String strEmailAlertMessage = request.getParameter( MARK_EMAIL_ALERT_MESSAGE + i ) == null ? StringUtils.EMPTY
+                            : request.getParameter( MARK_EMAIL_ALERT_MESSAGE + i );
+                    String strSmsAlertMessage = request.getParameter( MARK_SMS_ALERT_MESSAGE + i ) == null ? StringUtils.EMPTY
+                            : request.getParameter( MARK_SMS_ALERT_MESSAGE + i );
+                    String strAlertSubject = request.getParameter( MARK_ALERT_SUBJECT + i ) == null ? StringUtils.EMPTY
+                            : request.getParameter( MARK_ALERT_SUBJECT + i );
+                    String strPhoneNumber = request.getParameter( MARK_NUMBER_PHONE + i ) == null ? StringUtils.EMPTY
+                            : request.getParameter( MARK_NUMBER_PHONE + i );
                     String strEmailCc = request.getParameter( MARK_EMAIL_CC + i ) == null ? StringUtils.EMPTY : request.getParameter( MARK_EMAIL_CC + i );
-                    String strIdSateAfter = request.getParameter( MARK_STATUS_WORKFLOW + i ) == null ? StringUtils.EMPTY : request
-                            .getParameter( MARK_STATUS_WORKFLOW + i );
+                    String strIdSateAfter = request.getParameter( MARK_STATUS_WORKFLOW + i ) == null ? StringUtils.EMPTY
+                            : request.getParameter( MARK_STATUS_WORKFLOW + i );
 
                     if ( StringUtils.isEmpty( strTimeToAlert ) || !StringUtils.isNumeric( strTimeToAlert ) )
                     {

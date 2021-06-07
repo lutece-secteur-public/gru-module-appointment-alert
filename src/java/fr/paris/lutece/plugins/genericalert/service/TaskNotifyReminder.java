@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -118,13 +118,11 @@ public class TaskNotifyReminder extends SimpleTask
     private static final String PROPERTY_MAIL_SENDER_NAME = "genericalert.task_notify_reminder.mailSenderName";
     private static final String PROPERTY_SENDER_SMS = "genericalert.senderSms";
     private static final String PROPERTY_PREFIX_SMS_SENDER = "genericalert.prefixSenderSms";
-    
-    
-    
+
     private static final String MESSAGE_MARK_DESCRIPTION = "genericalert.task_notify_reminder.description";
 
     public static final String FORMAT_TIME = "HH:mm";
-    
+
     // service
     private final StateService _stateService = SpringContextService.getBean( StateService.BEAN_SERVICE );
     @Inject
@@ -174,19 +172,20 @@ public class TaskNotifyReminder extends SimpleTask
             calendar.setTime( date );
             Timestamp timestampDay = new Timestamp( calendar.getTimeInMillis( ) );
             AppointmentDTO appointment = AppointmentService.buildAppointmentDTOFromIdAppointment( nIdResource );
-            
+
             if ( appointment != null )
             {
                 config = TaskNotifyReminderConfigHome.findByIdForm( task.getId( ), appointment.getIdForm( ) );
             }
-            
+
             if ( config != null )
             {
                 List<ReminderAppointment> listReminders = null;
                 if ( FormService.findFormLightByPrimaryKey( appointment.getIdForm( ) ).getIsActive( ) )
                 {
-                    Timestamp timeStartDate = Timestamp.valueOf( appointment.getStartingDateTime( ));
-                    State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, nIdWorkflow );
+                    Timestamp timeStartDate = Timestamp.valueOf( appointment.getStartingDateTime( ) );
+                    State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE,
+                            nIdWorkflow );
                     if ( timeStartDate.getTime( ) > timestampDay.getTime( ) && stateAppointment != null && stateAppointment.getId( ) == stateBefore.getId( ) )
                     {
                         long minutes = Math.abs( TimeUnit.MILLISECONDS.toMinutes( timestampDay.getTime( ) - timeStartDate.getTime( ) ) );
@@ -277,12 +276,12 @@ public class TaskNotifyReminder extends SimpleTask
                 {
                     try
                     {
-                        
-                        String strDefaultRecipientSms=AppPropertiesService.getProperty( PROPERTY_PREFIX_SMS_SENDER, DEFAULT_PREFIX_SENDER );
-                        String strSenderSms=AppPropertiesService.getProperty( PROPERTY_SENDER_SMS,DEFAULT_SENDER_SMS );
-                        
+
+                        String strDefaultRecipientSms = AppPropertiesService.getProperty( PROPERTY_PREFIX_SMS_SENDER, DEFAULT_PREFIX_SENDER );
+                        String strSenderSms = AppPropertiesService.getProperty( PROPERTY_SENDER_SMS, DEFAULT_SENDER_SMS );
+
                         strRecipient += strDefaultRecipientSms;
-                            
+
                         MailService.sendMailHtml( strRecipient, strSenderName, strSenderSms, reminder.getAlertSubject( ), strSmsText );
                         bNotified = true;
                     }
@@ -327,7 +326,7 @@ public class TaskNotifyReminder extends SimpleTask
         entryFilter.setIdResource( appointment.getIdForm( ) );
 
         List<Integer> listIdResponse = AppointmentResponseService.findListIdResponse( appointment.getIdAppointment( ) );
-        List<Response> listResponses = new ArrayList< >( listIdResponse.size( ) );
+        List<Response> listResponses = new ArrayList<>( listIdResponse.size( ) );
         for ( int nIdResponse : listIdResponse )
         {
             Response response = ResponseHome.findByPrimaryKey( nIdResponse );

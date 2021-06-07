@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -84,8 +84,9 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
         if ( taskReminderConfig != null )
         {
             if ( taskReminderConfig.getListReminderAppointment( ).size( ) > 0 )
-            {            	
-                insertListReminderAppointment( taskReminderConfig.getIdTask(), taskReminderConfig.getListReminderAppointment( ), NotifyReminderPlugin.getPlugin( ) );
+            {
+                insertListReminderAppointment( taskReminderConfig.getIdTask( ), taskReminderConfig.getListReminderAppointment( ),
+                        NotifyReminderPlugin.getPlugin( ) );
             }
         }
     }
