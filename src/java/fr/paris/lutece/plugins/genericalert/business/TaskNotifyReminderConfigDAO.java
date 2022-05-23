@@ -73,21 +73,22 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     @Override
     public void insert( TaskNotifyReminderConfig taskReminderConfig )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, NotifyReminderPlugin.getPlugin( ) );
-
-        daoUtil.setInt( 1, taskReminderConfig.getIdTask( ) );
-        daoUtil.setInt( 2, taskReminderConfig.getIdForm( ) );
-        daoUtil.setInt( 3, taskReminderConfig.getNbAlerts( ) );
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
-        if ( taskReminderConfig != null )
-        {
-            if ( taskReminderConfig.getListReminderAppointment( ).size( ) > 0 )
-            {
-                insertListReminderAppointment( taskReminderConfig.getIdTask( ), taskReminderConfig.getListReminderAppointment( ),
-                        NotifyReminderPlugin.getPlugin( ) );
-            }
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, NotifyReminderPlugin.getPlugin( ) ) )
+        {	
+	        daoUtil.setInt( 1, taskReminderConfig.getIdTask( ) );
+	        daoUtil.setInt( 2, taskReminderConfig.getIdForm( ) );
+	        daoUtil.setInt( 3, taskReminderConfig.getNbAlerts( ) );
+	
+	        daoUtil.executeUpdate( );
+	        daoUtil.free( );
+	        if ( taskReminderConfig != null )
+	        {
+	            if ( taskReminderConfig.getListReminderAppointment( ).size( ) > 0 )
+	            {
+	                insertListReminderAppointment( taskReminderConfig.getIdTask( ), taskReminderConfig.getListReminderAppointment( ),
+	                        NotifyReminderPlugin.getPlugin( ) );
+	            }
+	        }
         }
     }
 
@@ -97,30 +98,32 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     @Override
     public TaskNotifyReminderConfig load( int nKey )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT + SQL_QUERY_WHERE + SQL_ID_TASK, NotifyReminderPlugin.getPlugin( ) );
-        daoUtil.setInt( 1, nKey );
-        daoUtil.executeQuery( );
-
-        TaskNotifyReminderConfig taskReminderConfig = null;
-
-        if ( daoUtil.next( ) )
+    	TaskNotifyReminderConfig taskReminderConfig = null;
+    	
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT + SQL_QUERY_WHERE + SQL_ID_TASK, NotifyReminderPlugin.getPlugin( ) ) )
         {
-            taskReminderConfig = new TaskNotifyReminderConfig( );
-            taskReminderConfig.setIdTask( daoUtil.getInt( 1 ) );
-            taskReminderConfig.setIdForm( daoUtil.getInt( 2 ) );
-            taskReminderConfig.setNbAlerts( daoUtil.getInt( 3 ) );
+	        daoUtil.setInt( 1, nKey );
+	        daoUtil.executeQuery( );
+	
+	        if ( daoUtil.next( ) )
+	        {
+	            taskReminderConfig = new TaskNotifyReminderConfig( );
+	            taskReminderConfig.setIdTask( daoUtil.getInt( 1 ) );
+	            taskReminderConfig.setIdForm( daoUtil.getInt( 2 ) );
+	            taskReminderConfig.setNbAlerts( daoUtil.getInt( 3 ) );
+	        }
         }
-        daoUtil.free( );
-        if ( taskReminderConfig != null )
-        {
-            List<ReminderAppointment> listReminder = loadListReminderAppointment( taskReminderConfig.getIdTask( ), taskReminderConfig.getIdForm( ),
-                    NotifyReminderPlugin.getPlugin( ) );
 
-            if ( listReminder != null )
-            {
-                taskReminderConfig.setListReminderAppointment( listReminder );
-            }
-        }
+	        if ( taskReminderConfig != null )
+	        {
+	            List<ReminderAppointment> listReminder = loadListReminderAppointment( taskReminderConfig.getIdTask( ), taskReminderConfig.getIdForm( ),
+	                    NotifyReminderPlugin.getPlugin( ) );
+	
+	            if ( listReminder != null )
+	            {
+	                taskReminderConfig.setListReminderAppointment( listReminder );
+	            }
+	        }
         return taskReminderConfig;
     }
 
@@ -130,20 +133,21 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     @Override
     public TaskNotifyReminderConfig loadConfigByIdForm( int idForm, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT + SQL_QUERY_WHERE + SQL_ID_FORM, plugin );
-        daoUtil.setInt( 1, idForm );
-        daoUtil.executeQuery( );
-
-        TaskNotifyReminderConfig taskReminderConfig = null;
-
-        if ( daoUtil.next( ) )
+    	TaskNotifyReminderConfig taskReminderConfig = null;
+    	
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT + SQL_QUERY_WHERE + SQL_ID_FORM, plugin ) )
         {
-            taskReminderConfig = new TaskNotifyReminderConfig( );
-            taskReminderConfig.setIdTask( daoUtil.getInt( 1 ) );
-            taskReminderConfig.setIdForm( daoUtil.getInt( 2 ) );
-            taskReminderConfig.setNbAlerts( daoUtil.getInt( 3 ) );
+	        daoUtil.setInt( 1, idForm );
+	        daoUtil.executeQuery( );
+	
+	        if ( daoUtil.next( ) )
+	        {
+	            taskReminderConfig = new TaskNotifyReminderConfig( );
+	            taskReminderConfig.setIdTask( daoUtil.getInt( 1 ) );
+	            taskReminderConfig.setIdForm( daoUtil.getInt( 2 ) );
+	            taskReminderConfig.setNbAlerts( daoUtil.getInt( 3 ) );
+	        }
         }
-        daoUtil.free( );
         if ( taskReminderConfig != null )
         {
             List<ReminderAppointment> listReminder = loadListReminderAppointment( taskReminderConfig.getIdTask( ), taskReminderConfig.getIdForm( ),
@@ -163,14 +167,14 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     @Override
     public void store( TaskNotifyReminderConfig taskReminderConfig )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE + SQL_QUERY_AND + SQL_ID_FORM, NotifyReminderPlugin.getPlugin( ) );
-
-        daoUtil.setInt( 1, taskReminderConfig.getNbAlerts( ) );
-        daoUtil.setInt( 2, taskReminderConfig.getIdTask( ) );
-        daoUtil.setInt( 3, taskReminderConfig.getIdForm( ) );
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE + SQL_QUERY_AND + SQL_ID_FORM, NotifyReminderPlugin.getPlugin( ) ) )
+        {	
+	        daoUtil.setInt( 1, taskReminderConfig.getNbAlerts( ) );
+	        daoUtil.setInt( 2, taskReminderConfig.getIdTask( ) );
+	        daoUtil.setInt( 3, taskReminderConfig.getIdForm( ) );
+	
+	        daoUtil.executeUpdate( );
+        }
 
         if ( taskReminderConfig.getListReminderAppointment( ).size( ) > 0 )
         {
@@ -184,17 +188,17 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     @Override
     public void delete( int idTask )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, NotifyReminderPlugin.getPlugin( ) );
-
-        Collection<Integer> listIdFormList = selectIdFormByTask( idTask, NotifyReminderPlugin.getPlugin( ) );
-        for ( Integer e : listIdFormList )
-        {
-            deleteListReminderAppointment( idTask, e, NotifyReminderPlugin.getPlugin( ) );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, NotifyReminderPlugin.getPlugin( ) ) )
+        {	
+	        Collection<Integer> listIdFormList = selectIdFormByTask( idTask, NotifyReminderPlugin.getPlugin( ) );
+	        for ( Integer e : listIdFormList )
+	        {
+	            deleteListReminderAppointment( idTask, e, NotifyReminderPlugin.getPlugin( ) );
+	        }
+	
+	        daoUtil.setInt( 1, idTask );
+	        daoUtil.executeUpdate( );
         }
-
-        daoUtil.setInt( 1, idTask );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
     }
 
     /**
@@ -203,22 +207,22 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     @Override
     public Collection<TaskNotifyReminderConfig> selectTaskReminderConfigsList( Plugin plugin )
     {
-        Collection<TaskNotifyReminderConfig> taskReminderConfigList = new ArrayList<TaskNotifyReminderConfig>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        Collection<TaskNotifyReminderConfig> taskReminderConfigList = new ArrayList<>( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-            TaskNotifyReminderConfig taskReminderConfig = new TaskNotifyReminderConfig( );
-
-            taskReminderConfig.setIdTask( daoUtil.getInt( 1 ) );
-            taskReminderConfig.setIdForm( daoUtil.getInt( 2 ) );
-            taskReminderConfig.setNbAlerts( daoUtil.getInt( 3 ) );
-
-            taskReminderConfigList.add( taskReminderConfig );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            TaskNotifyReminderConfig taskReminderConfig = new TaskNotifyReminderConfig( );
+	
+	            taskReminderConfig.setIdTask( daoUtil.getInt( 1 ) );
+	            taskReminderConfig.setIdForm( daoUtil.getInt( 2 ) );
+	            taskReminderConfig.setNbAlerts( daoUtil.getInt( 3 ) );
+	
+	            taskReminderConfigList.add( taskReminderConfig );
+	        }
         }
-
-        daoUtil.free( );
         return taskReminderConfigList;
     }
 
@@ -253,8 +257,9 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     @Override
     public Collection<Integer> selectIdTaskReminderConfigsList( Plugin plugin )
     {
-        Collection<Integer> taskReminderConfigList = new ArrayList<Integer>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin );
+        Collection<Integer> taskReminderConfigList = new ArrayList<>( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
+        {
         daoUtil.executeQuery( );
 
         while ( daoUtil.next( ) )
@@ -262,7 +267,7 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
             taskReminderConfigList.add( daoUtil.getInt( 1 ) );
         }
 
-        daoUtil.free( );
+        }
         return taskReminderConfigList;
     }
 
@@ -272,35 +277,36 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     @Override
     public List<ReminderAppointment> loadListReminderAppointment( int idTask, int nAppointmentFormId, Plugin plugin )
     {
-
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_REMINDER_APPOINTMENT_BY_PRIMARY_KEY + SQL_QUERY_ORDER_BY_RANK, plugin );
-        daoUtil.setInt( 1, nAppointmentFormId );
-        daoUtil.setInt( 2, idTask );
-        daoUtil.executeQuery( );
-
-        ReminderAppointment reminderAppointment;
-        List<ReminderAppointment> list = new ArrayList<ReminderAppointment>( );
-        while ( daoUtil.next( ) )
+    	List<ReminderAppointment> list = new ArrayList<>( );
+    	
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_REMINDER_APPOINTMENT_BY_PRIMARY_KEY + SQL_QUERY_ORDER_BY_RANK, plugin ) )
         {
-            reminderAppointment = new ReminderAppointment( );
-
-            int nIndex = 1;
-
-            reminderAppointment.setIdTask( daoUtil.getInt( nIndex++ ) );
-            reminderAppointment.setIdForm( daoUtil.getInt( nIndex++ ) );
-            reminderAppointment.setRank( daoUtil.getInt( nIndex++ ) );
-            reminderAppointment.setTimeToAlert( daoUtil.getInt( nIndex++ ) );
-            reminderAppointment.setEmailNotify( daoUtil.getBoolean( nIndex++ ) );
-            reminderAppointment.setSmsNotify( daoUtil.getBoolean( nIndex++ ) );
-            reminderAppointment.setEmailAlertMessage( daoUtil.getString( nIndex++ ) );
-            reminderAppointment.setSmsAlertMessage( daoUtil.getString( nIndex++ ) );
-            reminderAppointment.setAlertSubject( daoUtil.getString( nIndex++ ) );
-            reminderAppointment.setEmailCc( daoUtil.getString( nIndex++ ) );
-            reminderAppointment.setNumberPhone( daoUtil.getString( nIndex++ ) );
-            reminderAppointment.setIdStateAfter( daoUtil.getInt( nIndex ) );
-            list.add( reminderAppointment );
+	        daoUtil.setInt( 1, nAppointmentFormId );
+	        daoUtil.setInt( 2, idTask );
+	        daoUtil.executeQuery( );
+	
+	        ReminderAppointment reminderAppointment;
+	        while ( daoUtil.next( ) )
+	        {
+	            reminderAppointment = new ReminderAppointment( );
+	
+	            int nIndex = 1;
+	
+	            reminderAppointment.setIdTask( daoUtil.getInt( nIndex++ ) );
+	            reminderAppointment.setIdForm( daoUtil.getInt( nIndex++ ) );
+	            reminderAppointment.setRank( daoUtil.getInt( nIndex++ ) );
+	            reminderAppointment.setTimeToAlert( daoUtil.getInt( nIndex++ ) );
+	            reminderAppointment.setEmailNotify( daoUtil.getBoolean( nIndex++ ) );
+	            reminderAppointment.setSmsNotify( daoUtil.getBoolean( nIndex++ ) );
+	            reminderAppointment.setEmailAlertMessage( daoUtil.getString( nIndex++ ) );
+	            reminderAppointment.setSmsAlertMessage( daoUtil.getString( nIndex++ ) );
+	            reminderAppointment.setAlertSubject( daoUtil.getString( nIndex++ ) );
+	            reminderAppointment.setEmailCc( daoUtil.getString( nIndex++ ) );
+	            reminderAppointment.setNumberPhone( daoUtil.getString( nIndex++ ) );
+	            reminderAppointment.setIdStateAfter( daoUtil.getInt( nIndex ) );
+	            list.add( reminderAppointment );
+	        }
         }
-        daoUtil.free( );
 
         return list;
     }
@@ -310,31 +316,31 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
      */
     public List<TaskNotifyReminderConfig> loadListTaskNotifyConfig( int idTask, Plugin plugin )
     {
-
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT + SQL_QUERY_WHERE + SQL_ID_TASK, plugin );
-        daoUtil.setInt( 1, idTask );
-        daoUtil.executeQuery( );
-
-        List<TaskNotifyReminderConfig> listConfig = new ArrayList<TaskNotifyReminderConfig>( );
-        while ( daoUtil.next( ) )
+    	List<TaskNotifyReminderConfig> listConfig = new ArrayList<>( );
+    	
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT + SQL_QUERY_WHERE + SQL_ID_TASK, plugin ) )
         {
-            TaskNotifyReminderConfig taskReminderConfig = new TaskNotifyReminderConfig( );
-            List<ReminderAppointment> listReminder = new ArrayList<ReminderAppointment>( );
-
-            taskReminderConfig.setIdTask( daoUtil.getInt( 1 ) );
-            taskReminderConfig.setIdForm( daoUtil.getInt( 2 ) );
-            taskReminderConfig.setNbAlerts( daoUtil.getInt( 3 ) );
-
-            listReminder = loadListReminderAppointment( idTask, taskReminderConfig.getIdForm( ), plugin );
-
-            if ( listReminder != null )
-            {
-                taskReminderConfig.setListReminderAppointment( listReminder );
-            }
-            listConfig.add( taskReminderConfig );
-
+	        daoUtil.setInt( 1, idTask );
+	        daoUtil.executeQuery( );
+	        while ( daoUtil.next( ) )
+	        {
+	            TaskNotifyReminderConfig taskReminderConfig = new TaskNotifyReminderConfig( );
+	            List<ReminderAppointment> listReminder = new ArrayList<>( );
+	
+	            taskReminderConfig.setIdTask( daoUtil.getInt( 1 ) );
+	            taskReminderConfig.setIdForm( daoUtil.getInt( 2 ) );
+	            taskReminderConfig.setNbAlerts( daoUtil.getInt( 3 ) );
+	
+	            listReminder = loadListReminderAppointment( idTask, taskReminderConfig.getIdForm( ), plugin );
+	
+	            if ( listReminder != null )
+	            {
+	                taskReminderConfig.setListReminderAppointment( listReminder );
+	            }
+	            listConfig.add( taskReminderConfig );
+	
+	        }
         }
-        daoUtil.free( );
         return listConfig;
     }
 
@@ -344,21 +350,22 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     @Override
     public TaskNotifyReminderConfig loadByIdForm( int nKey, int idForm, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT + SQL_QUERY_WHERE + SQL_ID_TASK + SQL_QUERY_AND + SQL_ID_FORM, plugin );
-        daoUtil.setInt( 1, nKey );
-        daoUtil.setInt( 2, idForm );
-        daoUtil.executeQuery( );
-
-        TaskNotifyReminderConfig taskReminderConfig = null;
-
-        if ( daoUtil.next( ) )
+    	TaskNotifyReminderConfig taskReminderConfig = null;
+    	
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT + SQL_QUERY_WHERE + SQL_ID_TASK + SQL_QUERY_AND + SQL_ID_FORM, plugin ) )
         {
-            taskReminderConfig = new TaskNotifyReminderConfig( );
-            taskReminderConfig.setIdTask( daoUtil.getInt( 1 ) );
-            taskReminderConfig.setIdForm( daoUtil.getInt( 2 ) );
-            taskReminderConfig.setNbAlerts( daoUtil.getInt( 3 ) );
+	        daoUtil.setInt( 1, nKey );
+	        daoUtil.setInt( 2, idForm );
+	        daoUtil.executeQuery( );
+	
+	        if ( daoUtil.next( ) )
+	        {
+	            taskReminderConfig = new TaskNotifyReminderConfig( );
+	            taskReminderConfig.setIdTask( daoUtil.getInt( 1 ) );
+	            taskReminderConfig.setIdForm( daoUtil.getInt( 2 ) );
+	            taskReminderConfig.setNbAlerts( daoUtil.getInt( 3 ) );
+	        }
         }
-        daoUtil.free( );
         if ( taskReminderConfig != null )
         {
             List<ReminderAppointment> listReminder = loadListReminderAppointment( nKey, idForm, plugin );
@@ -381,23 +388,24 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
      */
     private void insertReminderAppointment( int nIdTask, ReminderAppointment reminderAppointment, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_REMINDER_APPOINTMENT_FORM_MESSAGE, plugin );
-        int nIndex = 1;
-
-        daoUtil.setInt( nIndex++, nIdTask );
-        daoUtil.setInt( nIndex++, reminderAppointment.getIdForm( ) );
-        daoUtil.setInt( nIndex++, reminderAppointment.getRank( ) );
-        daoUtil.setInt( nIndex++, reminderAppointment.getTimeToAlert( ) );
-        daoUtil.setBoolean( nIndex++, reminderAppointment.isEmailNotify( ) );
-        daoUtil.setBoolean( nIndex++, reminderAppointment.isSmsNotify( ) );
-        daoUtil.setString( nIndex++, reminderAppointment.getEmailAlertMessage( ) );
-        daoUtil.setString( nIndex++, reminderAppointment.getSmsAlertMessage( ) );
-        daoUtil.setString( nIndex++, reminderAppointment.getAlertSubject( ) );
-        daoUtil.setString( nIndex++, reminderAppointment.getEmailCc( ) );
-        daoUtil.setString( nIndex++, reminderAppointment.getNumberPhone( ) );
-        daoUtil.setInt( nIndex, reminderAppointment.getIdStateAfter( ) );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_REMINDER_APPOINTMENT_FORM_MESSAGE, plugin ) )
+        {
+	        int nIndex = 1;
+	
+	        daoUtil.setInt( nIndex++, nIdTask );
+	        daoUtil.setInt( nIndex++, reminderAppointment.getIdForm( ) );
+	        daoUtil.setInt( nIndex++, reminderAppointment.getRank( ) );
+	        daoUtil.setInt( nIndex++, reminderAppointment.getTimeToAlert( ) );
+	        daoUtil.setBoolean( nIndex++, reminderAppointment.isEmailNotify( ) );
+	        daoUtil.setBoolean( nIndex++, reminderAppointment.isSmsNotify( ) );
+	        daoUtil.setString( nIndex++, reminderAppointment.getEmailAlertMessage( ) );
+	        daoUtil.setString( nIndex++, reminderAppointment.getSmsAlertMessage( ) );
+	        daoUtil.setString( nIndex++, reminderAppointment.getAlertSubject( ) );
+	        daoUtil.setString( nIndex++, reminderAppointment.getEmailCc( ) );
+	        daoUtil.setString( nIndex++, reminderAppointment.getNumberPhone( ) );
+	        daoUtil.setInt( nIndex, reminderAppointment.getIdStateAfter( ) );
+	        daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -437,24 +445,25 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
             }
             else
             {
-                DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_REMINDER_APPOINTMENT_FORM_MESSAGE + SQL_QUERY_RANK, plugin );
-                int nIndex = 1;
-
-                daoUtil.setInt( nIndex++, reminderAppointment.getTimeToAlert( ) );
-                daoUtil.setBoolean( nIndex++, reminderAppointment.isEmailNotify( ) );
-                daoUtil.setBoolean( nIndex++, reminderAppointment.isSmsNotify( ) );
-                daoUtil.setString( nIndex++, reminderAppointment.getEmailAlertMessage( ) );
-                daoUtil.setString( nIndex++, reminderAppointment.getSmsAlertMessage( ) );
-                daoUtil.setString( nIndex++, reminderAppointment.getAlertSubject( ) );
-                daoUtil.setString( nIndex++, reminderAppointment.getEmailCc( ) );
-                daoUtil.setString( nIndex++, reminderAppointment.getNumberPhone( ) );
-                daoUtil.setInt( nIndex++, reminderAppointment.getIdStateAfter( ) );
-                daoUtil.setInt( nIndex++, reminderAppointment.getIdForm( ) );
-                daoUtil.setInt( nIndex++, reminderAppointment.getIdTask( ) );
-                daoUtil.setInt( nIndex, reminderAppointment.getRank( ) );
-
-                daoUtil.executeUpdate( );
-                daoUtil.free( );
+                try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_REMINDER_APPOINTMENT_FORM_MESSAGE + SQL_QUERY_RANK, plugin ) )
+                {
+	                int nIndex = 1;
+	
+	                daoUtil.setInt( nIndex++, reminderAppointment.getTimeToAlert( ) );
+	                daoUtil.setBoolean( nIndex++, reminderAppointment.isEmailNotify( ) );
+	                daoUtil.setBoolean( nIndex++, reminderAppointment.isSmsNotify( ) );
+	                daoUtil.setString( nIndex++, reminderAppointment.getEmailAlertMessage( ) );
+	                daoUtil.setString( nIndex++, reminderAppointment.getSmsAlertMessage( ) );
+	                daoUtil.setString( nIndex++, reminderAppointment.getAlertSubject( ) );
+	                daoUtil.setString( nIndex++, reminderAppointment.getEmailCc( ) );
+	                daoUtil.setString( nIndex++, reminderAppointment.getNumberPhone( ) );
+	                daoUtil.setInt( nIndex++, reminderAppointment.getIdStateAfter( ) );
+	                daoUtil.setInt( nIndex++, reminderAppointment.getIdForm( ) );
+	                daoUtil.setInt( nIndex++, reminderAppointment.getIdTask( ) );
+	                daoUtil.setInt( nIndex, reminderAppointment.getRank( ) );
+	
+	                daoUtil.executeUpdate( );
+                }
             }
         }
     }
@@ -474,36 +483,36 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
      */
     private ReminderAppointment loadReminderAppointment( int idTask, int nAppointmentFormId, int rank, Plugin plugin )
     {
+    	ReminderAppointment reminderAppointment;
 
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_REMINDER_APPOINTMENT_BY_PRIMARY_KEY + SQL_QUERY_RANK, plugin );
-        daoUtil.setInt( 1, nAppointmentFormId );
-        daoUtil.setInt( 2, idTask );
-        daoUtil.setInt( 3, rank );
-        daoUtil.executeQuery( );
-
-        ReminderAppointment reminderAppointment;
-        if ( daoUtil.next( ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_REMINDER_APPOINTMENT_BY_PRIMARY_KEY + SQL_QUERY_RANK, plugin ) )
         {
-            reminderAppointment = new ReminderAppointment( );
-            int nIndex = 1;
-            reminderAppointment.setIdTask( daoUtil.getInt( nIndex++ ) );
-            reminderAppointment.setIdForm( daoUtil.getInt( nIndex++ ) );
-            reminderAppointment.setRank( daoUtil.getInt( nIndex++ ) );
-            reminderAppointment.setTimeToAlert( daoUtil.getInt( nIndex++ ) );
-            reminderAppointment.setEmailNotify( daoUtil.getBoolean( nIndex++ ) );
-            reminderAppointment.setSmsNotify( daoUtil.getBoolean( nIndex++ ) );
-            reminderAppointment.setEmailAlertMessage( daoUtil.getString( nIndex++ ) );
-            reminderAppointment.setSmsAlertMessage( daoUtil.getString( nIndex++ ) );
-            reminderAppointment.setAlertSubject( daoUtil.getString( nIndex++ ) );
-            reminderAppointment.setEmailCc( daoUtil.getString( nIndex++ ) );
-            reminderAppointment.setNumberPhone( daoUtil.getString( nIndex++ ) );
-            reminderAppointment.setIdStateAfter( daoUtil.getInt( nIndex ) );
+	        daoUtil.setInt( 1, nAppointmentFormId );
+	        daoUtil.setInt( 2, idTask );
+	        daoUtil.setInt( 3, rank );
+	        daoUtil.executeQuery( );
+	        if ( daoUtil.next( ) )
+	        {
+	            reminderAppointment = new ReminderAppointment( );
+	            int nIndex = 1;
+	            reminderAppointment.setIdTask( daoUtil.getInt( nIndex++ ) );
+	            reminderAppointment.setIdForm( daoUtil.getInt( nIndex++ ) );
+	            reminderAppointment.setRank( daoUtil.getInt( nIndex++ ) );
+	            reminderAppointment.setTimeToAlert( daoUtil.getInt( nIndex++ ) );
+	            reminderAppointment.setEmailNotify( daoUtil.getBoolean( nIndex++ ) );
+	            reminderAppointment.setSmsNotify( daoUtil.getBoolean( nIndex++ ) );
+	            reminderAppointment.setEmailAlertMessage( daoUtil.getString( nIndex++ ) );
+	            reminderAppointment.setSmsAlertMessage( daoUtil.getString( nIndex++ ) );
+	            reminderAppointment.setAlertSubject( daoUtil.getString( nIndex++ ) );
+	            reminderAppointment.setEmailCc( daoUtil.getString( nIndex++ ) );
+	            reminderAppointment.setNumberPhone( daoUtil.getString( nIndex++ ) );
+	            reminderAppointment.setIdStateAfter( daoUtil.getInt( nIndex ) );
+	        }
+	        else
+	        {
+	            reminderAppointment = null;
+	        }
         }
-        else
-        {
-            reminderAppointment = null;
-        }
-        daoUtil.free( );
 
         return reminderAppointment;
     }
@@ -520,11 +529,12 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
      */
     private void deleteListReminderAppointment( int idTask, int nAppointmentFormId, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_REMINDER_APPOINTMENT_FORM_MESSAGE, plugin );
-        daoUtil.setInt( 1, nAppointmentFormId );
-        daoUtil.setInt( 2, idTask );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_REMINDER_APPOINTMENT_FORM_MESSAGE, plugin ) )
+        {
+	        daoUtil.setInt( 1, nAppointmentFormId );
+	        daoUtil.setInt( 2, idTask );
+	        daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -537,17 +547,18 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
      */
     private Collection<Integer> selectIdFormByTask( int idTask, Plugin plugin )
     {
-        Collection<Integer> listIdFormList = new ArrayList<Integer>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ID_FORM_BY_TASK, plugin );
-        daoUtil.setInt( 1, idTask );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        Collection<Integer> listIdFormList = new ArrayList<>( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ID_FORM_BY_TASK, plugin ) )
         {
-            listIdFormList.add( daoUtil.getInt( 1 ) );
+	        daoUtil.setInt( 1, idTask );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            listIdFormList.add( daoUtil.getInt( 1 ) );
+	        }
         }
-
-        daoUtil.free( );
+        
         return listIdFormList;
     }
 }
