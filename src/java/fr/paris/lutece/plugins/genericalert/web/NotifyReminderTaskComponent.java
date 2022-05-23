@@ -181,7 +181,7 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
             DatastoreService.setDataValue( PROPERTY_MAX_LENGTH_SMS_TEXT, AppPropertiesService.getProperty( PROPERTY_MAX_LENGTH_SMS_TEXT ) );
         }
 
-        Map<String, Object> model = new HashMap<String, Object>( );
+        Map<String, Object> model = new HashMap<>( );
         model.put( MARK_CONFIG, config );
         model.put( MARK_LIST_FORM, listForms );
         model.put( MARK_LIST_PHONE_NUMBERS, listTel );
@@ -207,7 +207,7 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
         String strApplyNbAlerts = request.getParameter( PARAMETER_APPLY_NB_ALERTS );
         String strForm = request.getParameter( PARAMETER_APPLY_ID_FORM );
 
-        List<ReminderAppointment> listAppointment = new ArrayList<ReminderAppointment>( );
+        List<ReminderAppointment> listAppointment = new ArrayList<>( );
 
         Boolean bCreate = false;
 
@@ -390,7 +390,7 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
      */
     private List<String> getListPhoneEntries( int idForm )
     {
-        List<String> listPhoneNumber = new ArrayList<String>( );
+        List<String> listPhoneNumber = new ArrayList<>( );
 
         EntryFilter entryFilter = new EntryFilter( );
         entryFilter.setIdResource( idForm );
@@ -418,7 +418,6 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
         return null;
     }
 
-    @Override
     public String getTaskInformationXml( int nIdHistory, HttpServletRequest request, Locale locale, ITask task )
     {
         return null;
