@@ -264,7 +264,7 @@ public class TaskNotifyReminder extends SimpleTask
                 catch( Exception e )
                 {
                     AppLogService.info( "CATCH sending MAIL" );
-                    AppLogService.error( "AppointmentReminderDaemon - Error sending reminder alert MAIL to : " + e.getMessage( ), e );
+                    AppLogService.error( "AppointmentReminderDaemon - Error sending reminder alert MAIL to : {}", e.getMessage( ), e );
                 }
             }
             // AppLogService.info( "SMS : " + reminder.isSmsNotify( ) );
@@ -288,7 +288,7 @@ public class TaskNotifyReminder extends SimpleTask
                     catch( Exception e )
                     {
                         AppLogService.info( "CATCH sending reminder alert SMS: " );
-                        AppLogService.error( "AppointmentReminderDaemon - Error sending reminder alert SMS to : " + strRecipient + e.getMessage( ), e );
+                        AppLogService.error( "AppointmentReminderDaemon - Error sending reminder alert SMS to : {} {}", strRecipient, e.getMessage( ), e );
                     }
                 }
             }
