@@ -165,7 +165,6 @@ public class TaskNotifyReminder extends SimpleTask
         if ( task != null )
         {
             Action action = _actionService.findByPrimaryKey( nIdAction );
-            State stateBefore = action.getStateBefore( );
             TaskNotifyReminderConfig config = null;
             Date date = new Date( );
             Calendar calendar = new GregorianCalendar( );
@@ -180,28 +179,30 @@ public class TaskNotifyReminder extends SimpleTask
 
             if ( config != null )
             {
-                List<ReminderAppointment> listReminders = null;
-                if ( FormService.findFormLightByPrimaryKey( appointment.getIdForm( ) ).getIsActive( ) )
-                {
-                    Timestamp timeStartDate = Timestamp.valueOf( appointment.getStartingDateTime( ) );
-                    State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE,
-                            nIdWorkflow );
-                    if ( timeStartDate.getTime( ) > timestampDay.getTime( ) && stateAppointment != null && stateAppointment.getId( ) == stateBefore.getId( ) )
+                for ( int stateBefore : action.getListIdStateBefore( ) ) { 
+                    List<ReminderAppointment> listReminders = null;
+                    if ( FormService.findFormLightByPrimaryKey( appointment.getIdForm( ) ).getIsActive( ) )
                     {
-                        long minutes = Math.abs( TimeUnit.MILLISECONDS.toMinutes( timestampDay.getTime( ) - timeStartDate.getTime( ) ) );
-                        /*
-                         * long lDiffTimeStamp = Math.abs( timestampDay.getTime( ) - timeStartDate.getTime( ) ); int nDays = (int) lDiffTimeStamp / ( 1000 * 60
-                         * * 60 * 24 ); int nDiffHours = ( (int) lDiffTimeStamp / ( 60 * 60 * 1000 ) % 24 ) + ( nDays * 24 ); int nDiffMin = ( nDiffHours * 60 )
-                         * + (int) ( lDiffTimeStamp / ( 60 * 1000 ) % 60 );
-                         */
-                        if ( config.getNbAlerts( ) > 0 )
+                        Timestamp timeStartDate = Timestamp.valueOf( appointment.getStartingDateTime( ) );
+                        State stateAppointment = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE,
+                                nIdWorkflow );
+                        if ( timeStartDate.getTime( ) > timestampDay.getTime( ) && stateAppointment != null && stateAppointment.getId( ) == stateBefore )
                         {
-                            listReminders = config.getListReminderAppointment( );
-                        }
+                            long minutes = Math.abs( TimeUnit.MILLISECONDS.toMinutes( timestampDay.getTime( ) - timeStartDate.getTime( ) ) );
+                            /*
+                            * long lDiffTimeStamp = Math.abs( timestampDay.getTime( ) - timeStartDate.getTime( ) ); int nDays = (int) lDiffTimeStamp / ( 1000 * 60
+                            * * 60 * 24 ); int nDiffHours = ( (int) lDiffTimeStamp / ( 60 * 60 * 1000 ) % 24 ) + ( nDays * 24 ); int nDiffMin = ( nDiffHours * 60 )
+                            * + (int) ( lDiffTimeStamp / ( 60 * 1000 ) % 60 );
+                            */
+                            if ( config.getNbAlerts( ) > 0 )
+                            {
+                                listReminders = config.getListReminderAppointment( );
+                            }
 
-                        for ( ReminderAppointment reminder : listReminders )
-                        {
-                            sendReminder( appointment, reminder, timeStartDate, minutes, nIdWorkflow, config, strResourceType, nIdAction );
+                            for ( ReminderAppointment reminder : listReminders )
+                            {
+                                sendReminder( appointment, reminder, timeStartDate, minutes, nIdWorkflow, config, strResourceType, nIdAction );
+                            }
                         }
                     }
                 }

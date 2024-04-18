@@ -39,6 +39,7 @@ import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
 import fr.paris.lutece.plugins.genericalert.service.TaskNotifyReminder;
 import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.action.ActionFilter;
+import fr.paris.lutece.plugins.workflowcore.business.state.State;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflowFilter;
 import fr.paris.lutece.plugins.workflowcore.business.workflow.Workflow;
@@ -86,25 +87,29 @@ public class AppointmentReminderDaemon extends Daemon
             for ( Action action : listAutomaticActions )
             {
                 ResourceWorkflowFilter filt = new ResourceWorkflowFilter( );
-                filt.setIdState( action.getStateBefore( ).getId( ) );
                 filt.setIdWorkflow( workflow.getId( ) );
                 filt.setResourceType( Appointment.APPOINTMENT_RESOURCE_TYPE );
 
-                List<ResourceWorkflow> listResource = resourceWorkflowService.getListResourceWorkflowByFilter( filt );
-
-                for ( ResourceWorkflow resource : listResource )
+                for( int idStateBefore : action.getListIdStateBefore() )
                 {
-                    try
+                    filt.setIdState( idStateBefore );
+
+                    List<ResourceWorkflow> listResource = resourceWorkflowService.getListResourceWorkflowByFilter( filt );
+    
+                    for ( ResourceWorkflow resource : listResource )
                     {
-                        _taskReminder.sendReminder( resource.getIdResource( ), resource.getResourceType( ), action.getId( ), workflow.getId( ) );
-
+                        try
+                        {
+                            _taskReminder.sendReminder( resource.getIdResource( ), resource.getResourceType( ), action.getId( ), workflow.getId( ) );
+    
+                        }
+                        catch( Exception e )
+                        {
+    
+                            AppLogService.error( "notify reminder appointment: {}", e.getMessage( ) , e );
+                        }
+    
                     }
-                    catch( Exception e )
-                    {
-
-                        AppLogService.error( "notify reminder appointment: {}", e.getMessage( ) , e );
-                    }
-
                 }
             }
         }
