@@ -39,9 +39,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -60,6 +61,7 @@ import fr.paris.lutece.plugins.genericattributes.service.entrytype.IEntryTypeSer
 import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
 import fr.paris.lutece.plugins.workflowcore.business.state.State;
 import fr.paris.lutece.plugins.workflowcore.business.state.StateFilter;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.state.StateService;
@@ -78,6 +80,8 @@ import fr.paris.lutece.util.url.UrlItem;
  * NotificationTaskComponent
  *
  */
+@ApplicationScoped
+@Named( "genericalert.notifyReminderTaskComponent" )
 public class NotifyReminderTaskComponent extends NoFormTaskComponent
 {
     // TEMPLATES
@@ -122,16 +126,30 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
 
     // properties
     private static final String PROPERTY_MAX_LENGTH_SMS_TEXT = "genericalert.maxLength.textSms";
-    // private IStateService _stateService = SpringContextService.getBean(
-    // StateService.BEAN_SERVICE );
 
+    // SERVICES
     @Inject
     @Named( StateService.BEAN_SERVICE )
     private IStateService _stateService;
 
-    @Inject
-    @Named( TaskNotifyReminderConfigService.BEAN_SERVICE )
     private ITaskConfigService _taskNotifyReminderConfigService;
+
+    /**
+     * Constructor
+     *
+     * @param taskType the task type
+     * @param taskConfigService the task config service
+     */
+    @Inject
+    public NotifyReminderTaskComponent(
+            @Named( "genericalert.taskTypeNotifyReminder" ) ITaskType taskType,
+            @Named( TaskNotifyReminderConfigService.BEAN_SERVICE ) ITaskConfigService taskConfigService )
+    {
+        super( );
+        setTaskType( taskType );
+        setTaskConfigService( taskConfigService );
+        _taskNotifyReminderConfigService = taskConfigService;
+    }
 
     @Override
     public String getDisplayTaskForm( int nIdResource, String strResourceType, HttpServletRequest request, Locale locale, ITask task )

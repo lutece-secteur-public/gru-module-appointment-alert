@@ -35,7 +35,7 @@ package fr.paris.lutece.plugins.genericalert.service;
 
 import fr.paris.lutece.plugins.genericalert.business.TaskNotifyReminderConfig;
 
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +52,7 @@ public interface ITaskNotifyReminderConfigService
      * 
      * @return a list of tasks
      */
-    @Transactional( NotifyReminderPlugin.BEAN_TRANSACTION_MANAGER )
+    @Transactional
     List<TaskNotifyReminderConfig> findAll( );
 
     /**
@@ -65,7 +65,7 @@ public interface ITaskNotifyReminderConfigService
      * @param idParentEntry
      *            idParentEntry
      */
-    @Transactional( NotifyReminderPlugin.BEAN_TRANSACTION_MANAGER )
+    @Transactional
     void selectUpdate( TaskNotifyReminderConfig config, String strIdEntry, int idParentEntry );
 
     /**
@@ -78,7 +78,7 @@ public interface ITaskNotifyReminderConfigService
      * @param idParentEntry
      *            idParentEntry
      */
-    @Transactional( NotifyReminderPlugin.BEAN_TRANSACTION_MANAGER )
+    @Transactional
     void unSelectUpdate( TaskNotifyReminderConfig config, String strIdEntry, int idParentEntry );
 
     /**
@@ -89,7 +89,7 @@ public interface ITaskNotifyReminderConfigService
      *            directory
      * @return list Selected items
      */
-    @Transactional( NotifyReminderPlugin.BEAN_TRANSACTION_MANAGER )
+    @Transactional
     Map<Integer, List<Integer>> loadSelectedList( int idTask, int idDirectory );
 
     /**
@@ -97,7 +97,7 @@ public interface ITaskNotifyReminderConfigService
      * @param config
      *            task management
      */
-    @Transactional( NotifyReminderPlugin.BEAN_TRANSACTION_MANAGER )
+    @Transactional
     void selectedRecords( TaskNotifyReminderConfig config );
 
     /**
@@ -107,6 +107,6 @@ public interface ITaskNotifyReminderConfigService
      * @param idDirectory
      *            id directory
      */
-    @Transactional( NotifyReminderPlugin.BEAN_TRANSACTION_MANAGER )
+    @Transactional
     void loadListEntriesTmp( int idTask, int idDirectory );
 }
