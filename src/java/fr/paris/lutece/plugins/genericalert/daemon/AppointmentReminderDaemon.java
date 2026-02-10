@@ -35,54 +35,50 @@ package fr.paris.lutece.plugins.genericalert.daemon;
 
 import java.util.List;
 
+import jakarta.enterprise.inject.spi.CDI;
+
 import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
 import fr.paris.lutece.plugins.genericalert.service.TaskNotifyReminder;
 import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.action.ActionFilter;
-import fr.paris.lutece.plugins.workflowcore.business.state.State;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflowFilter;
 import fr.paris.lutece.plugins.workflowcore.business.workflow.Workflow;
 import fr.paris.lutece.plugins.workflowcore.business.workflow.WorkflowFilter;
-import fr.paris.lutece.plugins.workflowcore.service.action.ActionService;
 import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowService;
-import fr.paris.lutece.plugins.workflowcore.service.resource.ResourceWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.IWorkflowService;
 import fr.paris.lutece.portal.service.daemon.Daemon;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
 /**
- * 
+ *
  * Class Appointment Daemon Reminder To send alert reminder
  */
 public class AppointmentReminderDaemon extends Daemon
 {
-
-    private TaskNotifyReminder _taskReminder = SpringContextService.getBean( "genericalert.taskNotifyReminder" );
+    private TaskNotifyReminder _taskReminder = CDI.current( ).select( TaskNotifyReminder.class ).get( );
+    private IWorkflowService _workflowService = CDI.current( ).select( IWorkflowService.class ).get( );
+    private IResourceWorkflowService _resourceWorkflowService = CDI.current( ).select( IResourceWorkflowService.class ).get( );
+    private IActionService _actionService = CDI.current( ).select( IActionService.class ).get( );
 
     @Override
     public void run( )
     {
-
-        IWorkflowService workflowService = SpringContextService.getBean( fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService.BEAN_SERVICE );
         WorkflowFilter workflowFilter = new WorkflowFilter( );
 
         workflowFilter.setIsEnabled( 1 );
 
-        List<Workflow> listWorkflows = workflowService.getListWorkflowsByFilter( workflowFilter );
-        IResourceWorkflowService resourceWorkflowService = SpringContextService.getBean( ResourceWorkflowService.BEAN_SERVICE );
+        List<Workflow> listWorkflows = _workflowService.getListWorkflowsByFilter( workflowFilter );
 
         for ( Workflow workflow : listWorkflows )
         {
-            IActionService actionService = SpringContextService.getBean( ActionService.BEAN_SERVICE );
             ActionFilter filter = new ActionFilter( );
 
             filter.setAutomaticReflexiveAction( true );
             filter.setIdWorkflow( workflow.getId( ) );
 
-            List<Action> listAutomaticActions = actionService.getListActionByFilter( filter );
+            List<Action> listAutomaticActions = _actionService.getListActionByFilter( filter );
 
             for ( Action action : listAutomaticActions )
             {
@@ -94,7 +90,7 @@ public class AppointmentReminderDaemon extends Daemon
                 {
                     filt.setIdState( idStateBefore );
 
-                    List<ResourceWorkflow> listResource = resourceWorkflowService.getListResourceWorkflowByFilter( filt );
+                    List<ResourceWorkflow> listResource = _resourceWorkflowService.getListResourceWorkflowByFilter( filt );
     
                     for ( ResourceWorkflow resource : listResource )
                     {

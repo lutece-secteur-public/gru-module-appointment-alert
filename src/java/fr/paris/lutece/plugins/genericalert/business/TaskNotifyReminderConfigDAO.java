@@ -37,6 +37,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+
 import fr.paris.lutece.plugins.genericalert.service.NotifyReminderPlugin;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
@@ -44,8 +47,9 @@ import fr.paris.lutece.util.sql.DAOUtil;
 /**
  * This class provides Data Access methods for TaskReminderConfig objects
  */
-
-public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderConfigDAO
+@ApplicationScoped
+@Named( "genericalert.taskNotifyReminderConfigDAO" )
+public class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderConfigDAO
 {
     // Constants
     private static final String SQL_QUERY_SELECT = "SELECT id_task, id_form, nb_alerts FROM workflow_task_notify_reminder_cf ";
@@ -60,12 +64,12 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     private static final String SQL_ID_TASK = " id_task = ?";
     private static final String SQL_ID_FORM = " id_form = ?";
 
-    private static final String SQL_QUERY_FIND_REMINDER_APPOINTMENT_BY_PRIMARY_KEY = "SELECT id_task, id_form, rank, time_to_alert, email_notify, sms_notify, email_alert_message, sms_alert_message, alert_subject, email_cc, phone_number, id_state_after FROM workflow_appointment_reminder WHERE id_form = ? AND id_task = ? ";
-    private static final String SQL_QUERY_INSERT_REMINDER_APPOINTMENT_FORM_MESSAGE = "INSERT INTO workflow_appointment_reminder(id_task,id_form, rank, time_to_alert, email_notify, sms_notify, email_alert_message, sms_alert_message, alert_subject, email_cc, phone_number, id_state_after) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
+    private static final String SQL_QUERY_FIND_REMINDER_APPOINTMENT_BY_PRIMARY_KEY = "SELECT id_task, id_form, `rank`, time_to_alert, email_notify, sms_notify, email_alert_message, sms_alert_message, alert_subject, email_cc, phone_number, id_state_after FROM workflow_appointment_reminder WHERE id_form = ? AND id_task = ? ";
+    private static final String SQL_QUERY_INSERT_REMINDER_APPOINTMENT_FORM_MESSAGE = "INSERT INTO workflow_appointment_reminder(id_task,id_form, `rank`, time_to_alert, email_notify, sms_notify, email_alert_message, sms_alert_message, alert_subject, email_cc, phone_number, id_state_after) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
     private static final String SQL_QUERY_UPDATE_REMINDER_APPOINTMENT_FORM_MESSAGE = "UPDATE workflow_appointment_reminder SET time_to_alert = ?, email_notify = ?, sms_notify = ?, email_alert_message = ?, sms_alert_message = ?, alert_subject = ?, email_cc = ?, phone_number = ?, id_state_after = ? WHERE id_form = ?  AND id_task = ?";
     private static final String SQL_QUERY_DELETE_REMINDER_APPOINTMENT_FORM_MESSAGE = "DELETE FROM workflow_appointment_reminder WHERE id_form = ? AND id_task= ? ";
-    private static final String SQL_QUERY_RANK = " AND rank = ?";
-    private static final String SQL_QUERY_ORDER_BY_RANK = " ORDER BY rank";
+    private static final String SQL_QUERY_RANK = " AND `rank` = ?";
+    private static final String SQL_QUERY_ORDER_BY_RANK = " ORDER BY `rank`";
 
     /**
      * {@inheritDoc }
@@ -80,7 +84,6 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
 	        daoUtil.setInt( 3, taskReminderConfig.getNbAlerts( ) );
 	
 	        daoUtil.executeUpdate( );
-	        daoUtil.free( );
 	        if ( taskReminderConfig != null )
 	        {
 	            if ( taskReminderConfig.getListReminderAppointment( ).size( ) > 0 )
@@ -232,23 +235,17 @@ public final class TaskNotifyReminderConfigDAO implements ITaskNotifyReminderCon
     @Override
     public void deleteReminderAppointment( int nIdTask, int nIdForm, int rank, boolean b, Plugin plugin )
     {
-        DAOUtil daoUtil = null;
-        if ( b )
+        String strQuery = b ? SQL_QUERY_DELETE_REMINDER_APPOINTMENT_FORM_MESSAGE : SQL_QUERY_DELETE_REMINDER_APPOINTMENT_FORM_MESSAGE + SQL_QUERY_RANK;
+        try ( DAOUtil daoUtil = new DAOUtil( strQuery, plugin ) )
         {
-            daoUtil = new DAOUtil( SQL_QUERY_DELETE_REMINDER_APPOINTMENT_FORM_MESSAGE, plugin );
             daoUtil.setInt( 1, nIdForm );
             daoUtil.setInt( 2, nIdTask );
+            if ( !b )
+            {
+                daoUtil.setInt( 3, rank );
+            }
+            daoUtil.executeUpdate( );
         }
-        else
-        {
-            daoUtil = new DAOUtil( SQL_QUERY_DELETE_REMINDER_APPOINTMENT_FORM_MESSAGE + SQL_QUERY_RANK, plugin );
-            daoUtil.setInt( 1, nIdForm );
-            daoUtil.setInt( 2, nIdTask );
-            daoUtil.setInt( 3, rank );
-        }
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
     }
 
     /**
