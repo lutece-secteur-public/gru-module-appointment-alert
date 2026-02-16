@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset genericalert:create_db_workflow_generic_alert.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 --
 -- Drop table  workflow_task_notify_reminder_cf if exists
 --
