@@ -43,9 +43,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -79,14 +80,13 @@ import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowService;
-import fr.paris.lutece.plugins.workflowcore.service.state.StateService;
+import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
 import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.IWorkflowService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.mail.MailService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -98,6 +98,8 @@ import fr.paris.lutece.portal.web.l10n.LocaleService;
  * @author Mairie de Paris
  *
  */
+@Dependent
+@Named( "genericalert.taskNotifyReminder" )
 public class TaskNotifyReminder extends SimpleTask
 {
 
@@ -124,7 +126,9 @@ public class TaskNotifyReminder extends SimpleTask
     public static final String FORMAT_TIME = "HH:mm";
 
     // service
-    private final StateService _stateService = SpringContextService.getBean( StateService.BEAN_SERVICE );
+    @Inject
+    private IStateService _stateService;
+
     @Inject
     @Named( TaskNotifyReminderConfigService.BEAN_SERVICE )
     private ITaskConfigService _taskNotifyReminderConfigService;
@@ -141,7 +145,8 @@ public class TaskNotifyReminder extends SimpleTask
     @Inject
     private IResourceWorkflowService _resourceWorkflowService;
 
-    IWorkflowService _workflowService = SpringContextService.getBean( fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService.BEAN_SERVICE );
+    @Inject
+    private IWorkflowService _workflowService;
 
     @Override
     public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
@@ -268,7 +273,6 @@ public class TaskNotifyReminder extends SimpleTask
                     AppLogService.error( "AppointmentReminderDaemon - Error sending reminder alert MAIL to : {}", e.getMessage( ), e );
                 }
             }
-            // AppLogService.info( "SMS : " + reminder.isSmsNotify( ) );
             if ( reminder.isSmsNotify( ) && reminder.getNumberPhone( ) != null )
             {
                 String strRecipient = getSmsFromAppointment( appointment, reminder );

@@ -33,9 +33,10 @@
  */
 package fr.paris.lutece.plugins.genericalert.business;
 
+import jakarta.enterprise.inject.spi.CDI;
+
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,7 +49,7 @@ public final class TaskNotifyReminderConfigHome
 {
     // Static variable pointed at the DAO instance
 
-    private static ITaskNotifyReminderConfigDAO _dao = SpringContextService.getBean( "genericalert.taskNotifyReminderConfigDAO" );
+    private static ITaskNotifyReminderConfigDAO _dao = CDI.current( ).select( ITaskNotifyReminderConfigDAO.class ).get( );
     private static Plugin _plugin = PluginService.getPlugin( "genericalert" );
 
     /**

@@ -33,76 +33,32 @@
  */
 package fr.paris.lutece.plugins.genericalert.service;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import fr.paris.lutece.plugins.workflow.business.task.TaskTypeBuilder;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Named;
 
-import fr.paris.lutece.plugins.genericalert.business.TaskNotifyReminderConfig;
-import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
-import fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService;
-
-import java.util.List;
-import java.util.Map;
-
 /**
- *
- * TaskFillingDirectoryConfigService
- *
+ * CDI Producer for TaskType NotifyReminder
  */
 @ApplicationScoped
-@Named( TaskNotifyReminderConfigService.BEAN_SERVICE )
-public class TaskNotifyReminderConfigService extends TaskConfigService implements ITaskNotifyReminderConfigService
+public class TaskTypeNotifyReminderProducer
 {
-
-    public static final String BEAN_SERVICE = "genericalert.taskNotifyReminderConfigService";
-
-    /**
-     * Constructor
-     *
-     * @param taskConfigDAO the task config DAO
-     */
-    @Inject
-    @SuppressWarnings( "unchecked" )
-    public TaskNotifyReminderConfigService(
-            @Named( "genericalert.taskNotifyReminderConfigDAO" ) ITaskConfigDAO<TaskNotifyReminderConfig> taskConfigDAO )
+    @Produces
+    @ApplicationScoped
+    @Named( "genericalert.taskTypeNotifyReminder" )
+    public ITaskType produceTaskTypeNotifyReminder(
+            @ConfigProperty( name = "genericalert.taskTypeNotifyReminder.key" ) String key,
+            @ConfigProperty( name = "genericalert.taskTypeNotifyReminder.titleI18nKey" ) String titleI18nKey,
+            @ConfigProperty( name = "genericalert.taskTypeNotifyReminder.beanName" ) String beanName,
+            @ConfigProperty( name = "genericalert.taskTypeNotifyReminder.configBeanName" ) String configBeanName,
+            @ConfigProperty( name = "genericalert.taskTypeNotifyReminder.configRequired", defaultValue = "true" ) boolean configRequired,
+            @ConfigProperty( name = "genericalert.taskTypeNotifyReminder.formTaskRequired", defaultValue = "false" ) boolean formTaskRequired,
+            @ConfigProperty( name = "genericalert.taskTypeNotifyReminder.taskForAutomaticAction", defaultValue = "true" ) boolean taskForAutomaticAction )
     {
-        setTaskConfigDAO( (ITaskConfigDAO) taskConfigDAO );
+        return TaskTypeBuilder.buildTaskType( key, titleI18nKey, beanName, configBeanName, configRequired, formTaskRequired, taskForAutomaticAction );
     }
-
-    @Override
-    public List<TaskNotifyReminderConfig> findAll( )
-    {
-        return null;
-    }
-
-    @Override
-    public void selectUpdate( TaskNotifyReminderConfig config, String strIdEntry, int idParentEntry )
-    {
-
-    }
-
-    @Override
-    public void unSelectUpdate( TaskNotifyReminderConfig config, String strIdEntry, int idParentEntry )
-    {
-
-    }
-
-    @Override
-    public Map<Integer, List<Integer>> loadSelectedList( int idTask, int idDirectory )
-    {
-        return null;
-    }
-
-    @Override
-    public void selectedRecords( TaskNotifyReminderConfig config )
-    {
-
-    }
-
-    @Override
-    public void loadListEntriesTmp( int idTask, int idDirectory )
-    {
-
-    }
-
 }
