@@ -111,7 +111,7 @@ public class TaskNotifyReminder extends SimpleTask
     private static final String MARK_LOCALIZATION = "${localisation}";
     private static final String MARK_CANCEL_APP = "${url_cancel}";
     private static final String DEFAULT_PREFIX_SENDER = "@contact-everyone.fr";
-    private static final String DEFAULT_SENDER_SMS = "magali.lemaire@paris.fr";
+    private static final String TASK_BEAN_NAME = "genericalert.taskNotifyReminder";
     private static final String MARK_REGEX_SMS = "^(06|07)[0-9]{8}$";
     private static final String USER_AUTO = "auto";
     private static final String MARK_DURATION_LIMIT = "daemon.reminder.interval";
@@ -148,25 +148,51 @@ public class TaskNotifyReminder extends SimpleTask
     @Inject
     private IWorkflowService _workflowService;
 
+    /**
+     * Does nothing: the reminders are sent by the daemon, the task only records them in the workflow history.
+     * 
+     * @param nIdResourceHistory
+     *            the resource history id
+     * @param request
+     *            the request
+     * @param locale
+     *            the locale
+     */
     @Override
     public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
     {
-        // elle est déclanché juste pour garder une trace dans l'historique du
-        // workflow
     }
 
-    public void sendReminder( int nIdResource, String strResourceType, int nIdAction, int nIdWorkflow )
+    /**
+     * Find the reminder task of an action.
+     * 
+     * @param nIdAction
+     *            the action id
+     * @return the reminder task of the action, or null if the action has none
+     */
+    public ITask findReminderTask( int nIdAction )
     {
-        ITask task = null;
-        List<ITask> listActionTasks = _taskService.getListTaskByIdAction( nIdAction, Locale.getDefault( ) );
-        for ( ITask tsk : listActionTasks )
-        {
-            if ( tsk.getTaskType( ) != null && tsk.getTaskType( ).getBeanName( ) != null
-                    && tsk.getTaskType( ).getBeanName( ).equals( "genericalert.taskNotifyReminder" ) )
-            {
-                task = tsk;
-            }
-        }
+        return _taskService.getListTaskByIdAction( nIdAction, Locale.getDefault( ) ).stream( )
+                .filter( t -> t.getTaskType( ) != null && TASK_BEAN_NAME.equals( t.getTaskType( ).getBeanName( ) ) ).reduce( ( first, last ) -> last )
+                .orElse( null );
+    }
+
+    /**
+     * Send the reminders of a task due for an appointment.
+     * 
+     * @param nIdResource
+     *            the appointment id
+     * @param strResourceType
+     *            the resource type
+     * @param task
+     *            the reminder task of the action
+     * @param nIdAction
+     *            the action id
+     * @param nIdWorkflow
+     *            the workflow id
+     */
+    public void sendReminder( int nIdResource, String strResourceType, ITask task, int nIdAction, int nIdWorkflow )
+    {
         if ( task != null )
         {
             Action action = _actionService.findByPrimaryKey( nIdAction );
@@ -185,7 +211,7 @@ public class TaskNotifyReminder extends SimpleTask
             if ( config != null )
             {
                 for ( int stateBefore : action.getListIdStateBefore( ) ) { 
-                    List<ReminderAppointment> listReminders = null;
+                    List<ReminderAppointment> listReminders = new ArrayList<>( );
                     if ( FormService.findFormLightByPrimaryKey( appointment.getIdForm( ) ).getIsActive( ) )
                     {
                         Timestamp timeStartDate = Timestamp.valueOf( appointment.getStartingDateTime( ) );
@@ -194,11 +220,6 @@ public class TaskNotifyReminder extends SimpleTask
                         if ( timeStartDate.getTime( ) > timestampDay.getTime( ) && stateAppointment != null && stateAppointment.getId( ) == stateBefore )
                         {
                             long minutes = Math.abs( TimeUnit.MILLISECONDS.toMinutes( timestampDay.getTime( ) - timeStartDate.getTime( ) ) );
-                            /*
-                            * long lDiffTimeStamp = Math.abs( timestampDay.getTime( ) - timeStartDate.getTime( ) ); int nDays = (int) lDiffTimeStamp / ( 1000 * 60
-                            * * 60 * 24 ); int nDiffHours = ( (int) lDiffTimeStamp / ( 60 * 60 * 1000 ) % 24 ) + ( nDays * 24 ); int nDiffMin = ( nDiffHours * 60 )
-                            * + (int) ( lDiffTimeStamp / ( 60 * 1000 ) % 60 );
-                            */
                             if ( config.getNbAlerts( ) > 0 )
                             {
                                 listReminders = config.getListReminderAppointment( );
@@ -282,8 +303,8 @@ public class TaskNotifyReminder extends SimpleTask
                     try
                     {
 
-                        String strDefaultRecipientSms = AppPropertiesService.getProperty( PROPERTY_PREFIX_SMS_SENDER, DEFAULT_PREFIX_SENDER );
-                        String strSenderSms = AppPropertiesService.getProperty( PROPERTY_SENDER_SMS, DEFAULT_SENDER_SMS );
+                        String strDefaultRecipientSms = StringUtils.defaultIfBlank( AppPropertiesService.getProperty( PROPERTY_PREFIX_SMS_SENDER ), DEFAULT_PREFIX_SENDER );
+                        String strSenderSms = StringUtils.defaultIfBlank( AppPropertiesService.getProperty( PROPERTY_SENDER_SMS ), strSenderMail );
 
                         strRecipient += strDefaultRecipientSms;
 

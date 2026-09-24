@@ -47,6 +47,7 @@ import fr.paris.lutece.plugins.workflowcore.business.workflow.Workflow;
 import fr.paris.lutece.plugins.workflowcore.business.workflow.WorkflowFilter;
 import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowService;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.IWorkflowService;
 import fr.paris.lutece.portal.service.daemon.Daemon;
 import fr.paris.lutece.portal.service.util.AppLogService;
@@ -82,6 +83,13 @@ public class AppointmentReminderDaemon extends Daemon
 
             for ( Action action : listAutomaticActions )
             {
+                ITask task = _taskReminder.findReminderTask( action.getId( ) );
+
+                if ( task == null )
+                {
+                    continue;
+                }
+
                 ResourceWorkflowFilter filt = new ResourceWorkflowFilter( );
                 filt.setIdWorkflow( workflow.getId( ) );
                 filt.setResourceType( Appointment.APPOINTMENT_RESOURCE_TYPE );
@@ -96,7 +104,7 @@ public class AppointmentReminderDaemon extends Daemon
                     {
                         try
                         {
-                            _taskReminder.sendReminder( resource.getIdResource( ), resource.getResourceType( ), action.getId( ), workflow.getId( ) );
+                            _taskReminder.sendReminder( resource.getIdResource( ), resource.getResourceType( ), task, action.getId( ), workflow.getId( ) );
     
                         }
                         catch( Exception e )
