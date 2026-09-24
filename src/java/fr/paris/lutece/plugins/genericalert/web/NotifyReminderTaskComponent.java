@@ -45,6 +45,7 @@ import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import fr.paris.lutece.plugins.appointment.service.FormService;
 import fr.paris.lutece.plugins.appointment.service.entrytype.EntryTypePhone;
@@ -59,7 +60,6 @@ import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.EntryTypeServiceManager;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.IEntryTypeService;
 import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
-import fr.paris.lutece.plugins.workflowcore.business.state.State;
 import fr.paris.lutece.plugins.workflowcore.business.state.StateFilter;
 import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
@@ -72,6 +72,7 @@ import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
 
@@ -112,9 +113,11 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
     private static final String MARK_EMAIL_CC = "emailCc_";
     private static final String MARK_STATUS_WORKFLOW = "state_";
     private static final String MARK_SMS_TEXT_LENGTH = "sms_maxlength";
+    private static final int DEFAULT_SMS_TEXT_LENGTH = 160;
     // JSP
     private static final String JSP_MODIFY_TASK = "jsp/admin/plugins/workflow/ModifyTask.jsp";
     // Errors
+    private static final String MESSAGE_ERROR_FORM_EMPTY = "genericalert.message.error.formIsEmpty";
     private static final String MESSAGE_ERROR_SUBJECT_EMPTY = "genericalert.message.error.subjectIsEmpty";
     private static final String MESSAGE_ERROR_STATUS_EMPTY = "genericalert.message.error.statusIsEmpty";
     private static final String MESSAGE_ERROR_ALERT_TIME_NO_VALID = "genericalert.message.error.alerttimeNoValid";
@@ -172,19 +175,25 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
         {
             config = TaskNotifyReminderConfigHome.findByIdForm( task.getId( ), nIdForm );
         }
+        else
+        {
+            config = TaskNotifyReminderConfigHome.loadListTaskNotifyConfig( task.getId( ) ).stream( ).findFirst( ).orElse( null );
+            nIdForm = ( config != null ) ? config.getIdForm( ) : 0;
+        }
 
-        List<AppointmentFormDTO> listForms = FormService.buildAllActiveAppointmentForm( );
-        List<String> listTel = getListPhoneEntries( nIdForm );
-        List<State> listStates = null;
+        ReferenceList listForms = new ReferenceList( );
+        FormService.buildAllActiveAppointmentForm( ).forEach( form -> listForms.addItem( form.getIdForm( ), form.getTitle( ) ) );
+        ReferenceList listTel = new ReferenceList( );
+        getListPhoneEntries( nIdForm ).forEach( phone -> listTel.addItem( phone, phone ) );
+        ReferenceList listStates = new ReferenceList( );
 
         AppointmentFormDTO tmpForm = FormService.buildAppointmentFormLight( nIdForm );
         if ( tmpForm != null )
         {
             StateFilter stateFilter = new StateFilter( );
             stateFilter.setIdWorkflow( tmpForm.getIdWorkflow( ) );
-            listStates = _stateService.getListStateByFilter( stateFilter );
+            _stateService.getListStateByFilter( stateFilter ).forEach( state -> listStates.addItem( state.getId( ), state.getName( ) ) );
         }
-        // initialiser la configuration
         if ( config == null )
         {
             config = new TaskNotifyReminderConfig( );
@@ -207,7 +216,7 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
         model.put( MARK_LOCALE, locale );
         model.put( MARK_LOCALE_TINY, locale );
-        model.put( MARK_SMS_TEXT_LENGTH, strMaxLenght );
+        model.put( MARK_SMS_TEXT_LENGTH, NumberUtils.toInt( strMaxLenght, DEFAULT_SMS_TEXT_LENGTH ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFY_REMINDER_CONFIG, locale, model );
 
@@ -228,6 +237,11 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
         List<ReminderAppointment> listAppointment = new ArrayList<>( );
 
         Boolean bCreate = false;
+
+        if ( !StringUtils.isNumeric( strIdForm ) )
+        {
+            return AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_FORM_EMPTY, AdminMessage.TYPE_STOP );
+        }
 
         int nIdForm = Integer.parseInt( strIdForm );
         UrlItem url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MODIFY_TASK );

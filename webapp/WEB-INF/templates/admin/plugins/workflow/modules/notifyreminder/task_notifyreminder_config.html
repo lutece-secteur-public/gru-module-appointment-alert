@@ -1,172 +1,102 @@
 <#include "/admin/util/editor/editor.html" />
-<@fieldSet legend='#i18n{genericalert.task_notify_reminder.title}'>
-	<@messages infos=(infos![]) errors=(errors![]) />
-	<#if config??>
-		<#assign listSize = config.nbAlerts!0>
-		<#assign listReminders = config.listReminderAppointment![]>
-	<#else>
-		<#assign listSize = 0>
-		<#assign listReminders = []>
-	</#if>
-
-	<@formGroup labelFor='id_form' labelKey='#i18n{genericalert.task_notify_reminder.labelForm}' mandatory=true>
-		<@row>
-			<@columns sm=8>
-				<select name="id_form" id="id_form" class="form-select">
-					<#list (listForms![]) as item>
-						<option value="${item.idForm}" <#if config?? && item.idForm==config.idForm>selected</#if>>${item.title!}</option>
-					</#list>
-				</select>
-			</@columns>
-			<@columns sm=4>
-				<@button type='submit' buttonIcon='check' title='#i18n{genericalert.task_notify_reminder.button.apply}' color='primary' params='name="apply_idForm"' />
-			</@columns>
-		</@row>
-	</@formGroup>
-
-	<@formGroup labelFor='nbAlerts' labelKey='#i18n{genericalert.task_notify_reminder.labelNumberAlerts}' helpKey='#i18n{genericalert.task_notify_reminder.labelNumberAlertsHelp}'>
-		<@row>
-			<@columns sm=8>
-				<@input type='text' name='nbAlerts' id='nbAlerts' value='${listSize!}' maxlength=1 />
-			</@columns>
-			<@columns sm=4>
-				<@button type='submit' buttonIcon='check' title='#i18n{genericalert.task_notify_reminder.button.apply}' color='primary' params='name="apply_nbAlerts" onclick="return confirmDelete();"' />
-			</@columns>
-		</@row>
-	</@formGroup>
-
-	<#if listSize gt 0>
-	<#list 1..listSize as i>
-		<#if listSize gte i>
-		<@fieldSet legend='#i18n{genericalert.task_notify_reminder.labelTextAlert} ${i}' fieldsetId='rappel_${i}'>
-
-			<@formGroup labelFor='timeToAlert_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextAvant}' helpKey='#i18n{genericalert.task_notify_reminder.labelTextAvantHelp}' mandatory=true>
-				<input type="text" maxlength="2" name="timeToAlert_${i}" id="timeToAlert_${i}" value="<#if listReminders?? && listReminders[i-1]?has_content>${listReminders[i-1].timeToAlert}</#if>" class="form-control"/>
-			</@formGroup>
-
-			<#assign emailChecked = listReminders?? && listReminders[i-1]?has_content && listReminders[i-1].emailNotify>
-			<#assign smsChecked = listReminders?? && listReminders[i-1]?has_content && listReminders[i-1].smsNotify>
-
-			<@formGroup labelFor='email_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextEmailAlert}'>
-				<@checkBox name='emailNotify_${i}' id='email_${i}' value='true' checked=emailChecked params='onchange="showEmail(${i})"' />
-			</@formGroup>
-
-			<#if listTel?? && listTel?size gt 0>
-			<@formGroup labelFor='sms_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextSmsAlert}'>
-				<@checkBox name='smsNotify_${i}' id='sms_${i}' value='true' checked=smsChecked params='onchange="showSms(${i})"' />
-			</@formGroup>
-			<@formGroup labelFor='tel_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTel}'>
-				<select name="tel_${i}" id="tel_${i}" class="form-select">
-					<#list listTel as item>
-						<option value="${item}" <#if listReminders?? && listReminders[i-1]?has_content && listReminders[i-1].numberPhone == item>selected</#if>>${item}</option>
-					</#list>
-				</select>
-			</@formGroup>
-			</#if>
-
-			<#if listStates??>
-			<@formGroup labelFor='state_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelState}' mandatory=true>
-				<select name="state_${i}" id="state_${i}" class="form-select">
-					<#list listStates as item>
-						<option value="${item.id}" <#if listReminders?? && listReminders[i-1]?has_content && listReminders[i-1].idStateAfter == item.id>selected</#if>>${item.name!}</option>
-					</#list>
-				</select>
-			</@formGroup>
-			</#if>
-
-			<@formGroup labelFor='alert_subject_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextSubject}' mandatory=true>
-				<input type="text" maxlength="255" name="alert_subject_${i}" id="alert_subject_${i}" value="<#if listReminders?? && listReminders[i-1]?has_content>${listReminders[i-1].alertSubject}</#if>" class="form-control"/>
-			</@formGroup>
-
-			<@formGroup labelFor='emailCc_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextCc}'>
-				<input type="text" maxlength="255" name="emailCc_${i}" id="emailCc_${i}" value="<#if listReminders?? && listReminders[i-1]?has_content>${listReminders[i-1].emailCc!}</#if>" class="form-control"/>
-			</@formGroup>
-
-			<@div id='email_textMessage_${i}' params='<#if emailChecked>style="display:block"<#else>style="display:none"</#if>'>
-				<@formGroup labelFor='email_textMessage_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextEmailAlertAppointment}' mandatory=true>
-					<@row>
-						<@columns sm=8>
-							<textarea class="richtext" name="email_textMessage_${i}" id="email_textMessage_input_${i}" rows="10" cols="90"><#if listReminders?? && listReminders[i-1]?has_content>${listReminders[i-1].emailAlertMessage!}</#if></textarea>
-						</@columns>
-						<@columns sm=4>
-							<small class="text-muted">#i18n{genericalert.task_notify_reminder.labelTextAlertAppointmentHelp}
-								<ul>
-									<li>${r"${firstName}"} : #i18n{genericalert.task_notify_reminder.labelTextFirstName}</li>
-									<li>${r"${lastName}"} : #i18n{genericalert.task_notify_reminder.labelTextLastName}</li>
-									<li>${r"${date_appointment}"} : #i18n{genericalert.task_notify_reminder.labelTextDateAppointment}</li>
-									<li>${r"${time_appointment}"} : #i18n{genericalert.task_notify_reminder.labelTextTimeAppointment}</li>
-									<li>${r"${localisation}"} : #i18n{genericalert.task_notify_reminder.labelTextLocalisation}</li>
-									<li>${r"${url_cancel}"} : #i18n{genericalert.task_notify_reminder.labelTextUrlCancel}</li>
-								</ul>
-							</small>
-						</@columns>
-					</@row>
-				</@formGroup>
-			</@div>
-
-			<@div id='sms_textMessage_${i}' params='<#if smsChecked>style="display:block"<#else>style="display:none"</#if>'>
-				<@formGroup labelFor='sms_textMessage_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextSmsAlertAppointment}' mandatory=true>
-					<@row>
-						<@columns sm=8>
-							<textarea name="sms_textMessage_${i}" id="sms_textMessage_input_${i}" class="form-control" rows="5" maxlength="${sms_maxlength!160}"><#if listReminders?? && listReminders[i-1]?has_content>${listReminders[i-1].smsAlertMessage!}</#if></textarea>
-						</@columns>
-						<@columns sm=4>
-							<small class="text-muted">#i18n{genericalert.task_notify_reminder.labelTextAlertAppointmentHelp}
-								<ul>
-									<li>${r"${firstName}"} : #i18n{genericalert.task_notify_reminder.labelTextFirstName}</li>
-									<li>${r"${lastName}"} : #i18n{genericalert.task_notify_reminder.labelTextLastName}</li>
-									<li>${r"${date_appointment}"} : #i18n{genericalert.task_notify_reminder.labelTextDateAppointment}</li>
-									<li>${r"${time_appointment}"} : #i18n{genericalert.task_notify_reminder.labelTextTimeAppointment}</li>
-								</ul>
-							</small>
-						</@columns>
-					</@row>
-				</@formGroup>
-			</@div>
-
-		</@fieldSet>
+<#macro markers sms=false>
+	<@p class='text-muted small mb-1'>#i18n{genericalert.task_notify_reminder.labelTextAlertAppointmentHelp}</@p>
+	<@ul class='text-muted small'>
+		<li><code>${r"${firstName}"}</code> : #i18n{genericalert.task_notify_reminder.labelTextFirstName}</li>
+		<li><code>${r"${lastName}"}</code> : #i18n{genericalert.task_notify_reminder.labelTextLastName}</li>
+		<li><code>${r"${date_appointment}"}</code> : #i18n{genericalert.task_notify_reminder.labelTextDateAppointment}</li>
+		<li><code>${r"${time_appointment}"}</code> : #i18n{genericalert.task_notify_reminder.labelTextTimeAppointment}</li>
+		<#if !sms>
+		<li><code>${r"${localisation}"}</code> : #i18n{genericalert.task_notify_reminder.labelTextLocalisation}</li>
+		<li><code>${r"${url_cancel}"}</code> : #i18n{genericalert.task_notify_reminder.labelTextUrlCancel}</li>
 		</#if>
-	</#list>
-	</#if>
+	</@ul>
+</#macro>
+<#assign listSize = (config.nbAlerts)!0>
+<#assign listReminders = (config.listReminderAppointment)![]>
+<@fieldSet legend='#i18n{genericalert.task_notify_reminder.title}'>
+	<@formGroup labelFor='id_form' labelKey='#i18n{genericalert.task_notify_reminder.labelForm}' mandatory=true>
+		<@inputGroup>
+			<@select name='id_form' id='id_form' items=listForms default_value='${(config.idForm)!}' />
+			<@button type='submit' name='apply_idForm' buttonIcon='check' title='#i18n{genericalert.task_notify_reminder.button.apply}' color='light' />
+		</@inputGroup>
+	</@formGroup>
+	<@formGroup labelFor='nbAlerts' labelKey='#i18n{genericalert.task_notify_reminder.labelNumberAlerts}' helpKey='#i18n{genericalert.task_notify_reminder.labelNumberAlertsHelp}'>
+		<@inputGroup>
+			<@input type='number' name='nbAlerts' id='nbAlerts' value='${listSize}' min=0 max=9 />
+			<@button type='submit' name='apply_nbAlerts' buttonIcon='check' title='#i18n{genericalert.task_notify_reminder.button.apply}' color='light' params='data-confirm-none="#i18n{genericalert.task_notify_reminder.confirmRemoveAll}"' />
+		</@inputGroup>
+	</@formGroup>
 </@fieldSet>
+<#if listSize gt 0>
+<#list 1..listSize as i>
+	<#if i <= listReminders?size><#assign reminder = listReminders[i-1]><#else><#assign reminder = {}></#if>
+	<#assign emailChecked = (reminder.emailNotify)!false>
+	<#assign smsChecked = (reminder.smsNotify)!false>
+	<@fieldSet legend='#i18n{genericalert.task_notify_reminder.labelTextAlert} ${i}' fieldsetId='rappel_${i}'>
+		<@formGroup labelFor='timeToAlert_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextAvant}' helpKey='#i18n{genericalert.task_notify_reminder.labelTextAvantHelp}' mandatory=true>
+			<@input type='number' name='timeToAlert_${i}' id='timeToAlert_${i}' value='${(reminder.timeToAlert)!}' min=0 max=99 />
+		</@formGroup>
+		<@formGroup labelFor='state_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelState}' mandatory=true>
+			<@select name='state_${i}' id='state_${i}' items=listStates default_value='${(reminder.idStateAfter)!}' />
+		</@formGroup>
+		<@formGroup labelFor='alert_subject_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextSubject}' mandatory=true>
+			<@input type='text' name='alert_subject_${i}' id='alert_subject_${i}' value='${(reminder.alertSubject)!}' maxlength=255 />
+		</@formGroup>
+		<@formGroup labelFor='emailCc_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextCc}'>
+			<@input type='text' name='emailCc_${i}' id='emailCc_${i}' value='${(reminder.emailCc)!}' maxlength=255 />
+		</@formGroup>
+		<@formGroup>
+			<@checkBox orientation='switch' name='emailNotify_${i}' id='email_${i}' value='true' checked=emailChecked labelKey='#i18n{genericalert.task_notify_reminder.labelTextEmailAlert}' params='data-toggle-block="email_block_${i}"' />
+		</@formGroup>
+		<@div id='email_block_${i}' params=emailChecked?then('', 'hidden')>
+			<@row>
+				<@columns sm=8>
+					<@formGroup labelFor='email_textMessage_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextEmailAlertAppointment}' mandatory=true>
+						<@input type='textarea' name='email_textMessage_${i}' id='email_textMessage_${i}' richtext=true rows=10>${(reminder.emailAlertMessage)!}</@input>
+					</@formGroup>
+				</@columns>
+				<@columns sm=4>
+					<@markers />
+				</@columns>
+			</@row>
+		</@div>
+		<#if listTel?has_content>
+			<@formGroup>
+				<@checkBox orientation='switch' name='smsNotify_${i}' id='sms_${i}' value='true' checked=smsChecked labelKey='#i18n{genericalert.task_notify_reminder.labelTextSmsAlert}' params='data-toggle-block="sms_block_${i}"' />
+			</@formGroup>
+			<@div id='sms_block_${i}' params=smsChecked?then('', 'hidden')>
+				<@formGroup labelFor='tel_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTel}' mandatory=true>
+					<@select name='tel_${i}' id='tel_${i}' items=listTel default_value='${(reminder.numberPhone)!}' />
+				</@formGroup>
+				<@row>
+					<@columns sm=8>
+						<@formGroup labelFor='sms_textMessage_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextSmsAlertAppointment}' mandatory=true>
+							<@input type='textarea' name='sms_textMessage_${i}' id='sms_textMessage_${i}' rows=5 maxlength=sms_maxlength>${(reminder.smsAlertMessage)!}</@input>
+						</@formGroup>
+					</@columns>
+					<@columns sm=4>
+						<@markers sms=true />
+					</@columns>
+				</@row>
+			</@div>
+		</#if>
+	</@fieldSet>
+</#list>
+</#if>
 <@initEditor />
 <script>
-	function showEmail( i )
-	{
-		const checkbox = document.getElementById( 'email_' + i );
-		const container = document.getElementById( 'email_textMessage_' + i );
-		if ( checkbox && container )
-		{
-			container.style.display = checkbox.checked ? 'block' : 'none';
-		}
-	}
-
-	function showSms( i )
-	{
-		const checkbox = document.getElementById( 'sms_' + i );
-		const container = document.getElementById( 'sms_textMessage_' + i );
-		if ( checkbox && container )
-		{
-			container.style.display = checkbox.checked ? 'block' : 'none';
-		}
-	}
-
-	document.addEventListener( 'DOMContentLoaded', function()
-	{
-		for ( let i = 1; i < 10; i++ )
-		{
-			showEmail( i );
-			showSms( i );
+document.addEventListener( 'DOMContentLoaded', () => {
+	document.querySelectorAll( 'input[data-toggle-block]' ).forEach( ( box ) => {
+		box.addEventListener( 'change', () => {
+			document.getElementById( box.dataset.toggleBlock ).hidden = !box.checked;
+		});
+	});
+	const apply = document.querySelector( 'button[name="apply_nbAlerts"]' );
+	apply.addEventListener( 'click', ( e ) => {
+		if ( document.getElementById( 'nbAlerts' ).value === '0' && !confirm( apply.dataset.confirmNone ) ) {
+			e.preventDefault( );
 		}
 	});
-
-	function confirmDelete()
-	{
-		const nbAlerts = document.getElementById( 'nbAlerts' );
-		if ( nbAlerts && nbAlerts.value === '0' )
-		{
-			return confirm( 'Voulez-vous supprimer tous les rappels' );
-		}
-		return true;
-	}
+});
 </script>
