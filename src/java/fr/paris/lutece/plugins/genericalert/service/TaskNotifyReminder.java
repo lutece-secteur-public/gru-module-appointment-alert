@@ -76,6 +76,7 @@ import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
 import fr.paris.lutece.plugins.workflowcore.business.state.State;
+import fr.paris.lutece.plugins.workflowcore.exception.ResourceWorkflowLockedException;
 import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
@@ -462,8 +463,16 @@ public class TaskNotifyReminder extends SimpleTask
                 _resourceWorkflowService.update( resourceWorkflow );
                 // Execute the relative tasks of the state in the workflow
                 // We use AutomaticReflexiveActions because we don't want to change the state of the resource by executing actions.
-                _workflowService.doProcessAutomaticReflexiveActions( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, state.getId( ),
-                        null, locale );
+                try
+                {
+                    _workflowService.doProcessAutomaticReflexiveActions( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, state.getId( ),
+                            null, locale );
+                }
+                catch( ResourceWorkflowLockedException e )
+                {
+                    // Another action is in progress on the appointment (user, agent or other instance): the reminder goes on
+                    AppLogService.info( "Reflexive actions skipped for the appointment {} after its reminder: {}", appointment.getIdAppointment( ), e.getMessage( ) );
+                }
             }
         }
     }
