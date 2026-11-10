@@ -160,11 +160,17 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
         return null;
     }
 
-    @Override
-    public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
+    /**
+     * Get the configuration the screen shows: the one of the form chosen in the list, else the first one of the task
+     *
+     * @param nIdTask
+     *            the id of the task
+     * @param strIdForm
+     *            the id of the form chosen in the list, or null
+     * @return the configuration, a new one for a form without configuration
+     */
+    static TaskNotifyReminderConfig getConfigToDisplay( int nIdTask, String strIdForm )
     {
-
-        String strIdForm = request.getParameter( PARAMETER_ID_FORM ) == null ? StringUtils.EMPTY : request.getParameter( PARAMETER_ID_FORM );
         int nIdForm = 0;
         TaskNotifyReminderConfig config = null;
         if ( StringUtils.isNotEmpty( strIdForm ) && StringUtils.isNumeric( strIdForm ) )
@@ -173,13 +179,30 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
         }
         if ( StringUtils.isNotEmpty( strIdForm ) )
         {
-            config = TaskNotifyReminderConfigHome.findByIdForm( task.getId( ), nIdForm );
+            config = TaskNotifyReminderConfigHome.findByIdForm( nIdTask, nIdForm );
         }
         else
         {
-            config = TaskNotifyReminderConfigHome.loadListTaskNotifyConfig( task.getId( ) ).stream( ).findFirst( ).orElse( null );
+            config = TaskNotifyReminderConfigHome.loadListTaskNotifyConfig( nIdTask ).stream( ).findFirst( ).orElse( null );
             nIdForm = ( config != null ) ? config.getIdForm( ) : 0;
         }
+        if ( config == null )
+        {
+            config = new TaskNotifyReminderConfig( );
+            config.setIdTask( nIdTask );
+            // The form chosen in the list, which has no configuration yet, stays selected
+            config.setIdForm( nIdForm );
+            config.setListReminderAppointment( new ArrayList<ReminderAppointment>( ) );
+        }
+        return config;
+    }
+
+    @Override
+    public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
+    {
+
+        TaskNotifyReminderConfig config = getConfigToDisplay( task.getId( ), request.getParameter( PARAMETER_ID_FORM ) );
+        int nIdForm = config.getIdForm( );
 
         ReferenceList listForms = new ReferenceList( );
         FormService.buildAllActiveAppointmentForm( ).forEach( form -> listForms.addItem( form.getIdForm( ), form.getTitle( ) ) );
@@ -194,13 +217,6 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
             stateFilter.setIdWorkflow( tmpForm.getIdWorkflow( ) );
             _stateService.getListStateByFilter( stateFilter ).forEach( state -> listStates.addItem( state.getId( ), state.getName( ) ) );
         }
-        if ( config == null )
-        {
-            config = new TaskNotifyReminderConfig( );
-            config.setIdTask( task.getId( ) );
-            config.setListReminderAppointment( new ArrayList<ReminderAppointment>( ) );
-        }
-
         String strMaxLenght = DatastoreService.getDataValue( PROPERTY_MAX_LENGTH_SMS_TEXT, StringUtils.EMPTY );
 
         if ( !DatastoreService.existsKey( PROPERTY_MAX_LENGTH_SMS_TEXT ) )
