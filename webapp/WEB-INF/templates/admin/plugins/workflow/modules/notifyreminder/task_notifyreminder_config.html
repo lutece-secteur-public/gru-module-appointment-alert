@@ -24,7 +24,7 @@
 	<@formGroup labelFor='nbAlerts' labelKey='#i18n{genericalert.task_notify_reminder.labelNumberAlerts}' helpKey='#i18n{genericalert.task_notify_reminder.labelNumberAlertsHelp}'>
 		<@inputGroup>
 			<@input type='number' name='nbAlerts' id='nbAlerts' value='${listSize}' min=0 max=9 />
-			<@button type='submit' name='apply_nbAlerts' buttonIcon='check' title='#i18n{genericalert.task_notify_reminder.button.apply}' color='light' params='data-confirm-none="#i18n{genericalert.task_notify_reminder.confirmRemoveAll}"' />
+			<@button type='submit' name='apply_nbAlerts' buttonIcon='check' title='#i18n{genericalert.task_notify_reminder.button.apply}' color='light' params={"data-confirm-none": "#i18n{genericalert.task_notify_reminder.confirmRemoveAll}"} />
 		</@inputGroup>
 	</@formGroup>
 </@fieldSet>
@@ -47,9 +47,9 @@
 			<@input type='text' name='emailCc_${i}' id='emailCc_${i}' value='${(reminder.emailCc)!}' maxlength=255 />
 		</@formGroup>
 		<@formGroup>
-			<@checkBox orientation='switch' name='emailNotify_${i}' id='email_${i}' value='true' checked=emailChecked labelKey='#i18n{genericalert.task_notify_reminder.labelTextEmailAlert}' params='data-toggle-block="email_block_${i}"' />
+			<@checkBox orientation='switch' name='emailNotify_${i}' id='email_${i}' value='true' checked=emailChecked labelKey='#i18n{genericalert.task_notify_reminder.labelTextEmailAlert}' params={"data-toggle-block": "email_block_${i}"} />
 		</@formGroup>
-		<@div id='email_block_${i}' params=emailChecked?then('', 'hidden')>
+		<@div id='email_block_${i}' params={"hidden": !emailChecked}>
 			<@row>
 				<@columns sm=8>
 					<@formGroup labelFor='email_textMessage_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTextEmailAlertAppointment}' mandatory=true>
@@ -63,9 +63,9 @@
 		</@div>
 		<#if listTel?has_content>
 			<@formGroup>
-				<@checkBox orientation='switch' name='smsNotify_${i}' id='sms_${i}' value='true' checked=smsChecked labelKey='#i18n{genericalert.task_notify_reminder.labelTextSmsAlert}' params='data-toggle-block="sms_block_${i}"' />
+				<@checkBox orientation='switch' name='smsNotify_${i}' id='sms_${i}' value='true' checked=smsChecked labelKey='#i18n{genericalert.task_notify_reminder.labelTextSmsAlert}' params={"data-toggle-block": "sms_block_${i}"} />
 			</@formGroup>
-			<@div id='sms_block_${i}' params=smsChecked?then('', 'hidden')>
+			<@div id='sms_block_${i}' params={"hidden": !smsChecked}>
 				<@formGroup labelFor='tel_${i}' labelKey='#i18n{genericalert.task_notify_reminder.labelTel}' mandatory=true>
 					<@select name='tel_${i}' id='tel_${i}' items=listTel default_value='${(reminder.numberPhone)!}' />
 				</@formGroup>
