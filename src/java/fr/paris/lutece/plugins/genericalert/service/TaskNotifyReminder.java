@@ -322,9 +322,13 @@ public class TaskNotifyReminder extends SimpleTask
             if ( bNotified )
             {
                 appointment.setNotification( reminder.getRank( ) );
+                // The DTO does not carry the stored columns of the appointment (places, cancel and report actions):
+                // update the stored appointment
+                Appointment storedAppointment = AppointmentService.findAppointmentById( appointment.getIdAppointment( ) );
+                storedAppointment.setNotification( reminder.getRank( ) );
                 try
                 {
-                    AppointmentService.updateAppointment( appointment );
+                    AppointmentService.updateAppointment( storedAppointment );
                     doChangeState( config, reminder, nIdWorkflow, appointment );
                 }
                 catch( Exception e )
