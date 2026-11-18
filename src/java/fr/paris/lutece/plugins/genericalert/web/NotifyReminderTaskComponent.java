@@ -301,7 +301,8 @@ public class NotifyReminderTaskComponent extends NoFormTaskComponent
 
             if ( nbAlerts < listReminder.size( ) && nbAlerts != 0 && strForm == null )
             {
-                for ( int i = nbAlerts + 1; i <= listReminder.size( ); i++ )
+                // From the last rank down: the list shrinks at each removal
+                for ( int i = listReminder.size( ); i > nbAlerts; i-- )
                 {
 
                     TaskNotifyReminderConfigHome.removeAppointmentReminder( config.getIdTask( ), nIdForm, i, false );

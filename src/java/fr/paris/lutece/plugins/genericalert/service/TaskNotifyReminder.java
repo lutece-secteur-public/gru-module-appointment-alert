@@ -42,6 +42,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
@@ -223,7 +224,10 @@ public class TaskNotifyReminder extends SimpleTask
                             long minutes = Math.abs( TimeUnit.MILLISECONDS.toMinutes( timestampDay.getTime( ) - timeStartDate.getTime( ) ) );
                             if ( config.getNbAlerts( ) > 0 )
                             {
-                                listReminders = config.getListReminderAppointment( );
+                                // Only the reminders of the configured number: a row of a higher rank may remain from an older configuration
+                                int nNbAlerts = config.getNbAlerts( );
+                                listReminders = config.getListReminderAppointment( ).stream( ).filter( r -> r.getRank( ) <= nNbAlerts )
+                                        .collect( Collectors.toList( ) );
                             }
 
                             for ( ReminderAppointment reminder : listReminders )
