@@ -260,8 +260,15 @@ public class TaskNotifyReminder extends SimpleTask
         long nMinTime = ( reminder.getTimeToAlert( ) * 60 * 24 ) - nInterval;
         long nMaxTime = ( reminder.getTimeToAlert( ) * 60 * 24 ) + nInterval;
 
-        if ( nDiffMin <= nMaxTime && nDiffMin >= nMinTime
-                && ( ( appointment.getNotification( ) == 0 ) || ( appointment.getNotification( ) != ( reminder.getRank( ) ) ) ) )
+        if ( nDiffMin > nMaxTime || nDiffMin < nMinTime )
+        {
+            return;
+        }
+        // The DTO does not carry the stored columns of the appointment (notification, places, cancel and report actions):
+        // read and update the stored appointment
+        Appointment storedAppointment = AppointmentService.findAppointmentById( appointment.getIdAppointment( ) );
+        if ( storedAppointment != null
+                && ( ( storedAppointment.getNotification( ) == 0 ) || ( storedAppointment.getNotification( ) != ( reminder.getRank( ) ) ) ) )
         {
             boolean bNotified = false;
             Locale locale = LocaleService.getDefault( );
@@ -322,9 +329,6 @@ public class TaskNotifyReminder extends SimpleTask
             if ( bNotified )
             {
                 appointment.setNotification( reminder.getRank( ) );
-                // The DTO does not carry the stored columns of the appointment (places, cancel and report actions):
-                // update the stored appointment
-                Appointment storedAppointment = AppointmentService.findAppointmentById( appointment.getIdAppointment( ) );
                 storedAppointment.setNotification( reminder.getRank( ) );
                 try
                 {
