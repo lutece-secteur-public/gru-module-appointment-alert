@@ -9,7 +9,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>module-appointment-alert</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>3.0.3-SNAPSHOT</version>
+    <version>3.0.4-SNAPSHOT</version>
     <name>Lutece appointment alert module</name>
 
     <repositories>
